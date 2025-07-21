@@ -17,7 +17,7 @@
 /**
  * Version information
  *
- * @package    mod_openai_chat
+ * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
  * @copyright  Based on work by 2022 Bryce Yoder <me@bryceyoder.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,8 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'mod_openai_chat';
-$plugin->version = 2025021800;
-$plugin->requires = 2022041600;
+$plugin->component = 'mod_intebchat';
+$plugin->version = 2024062500; // o cualquier número actual
+$plugin->requires = 2022041900; // versión mínima de Moodle
 $plugin->maturity = MATURITY_STABLE;
-$plugin->release = '1.0.0';
+$plugin->release = 'v1.0';

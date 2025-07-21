@@ -15,20 +15,20 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The mod_openai_chat course module viewed event.
+ * The mod_intebchat course module viewed event.
  *
- * @package    mod_openai_chat
+ * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
  * @copyright  Based on work by 2020 Mikel Martín <mikel@moodle.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_openai_chat\event;
+namespace mod_intebchat\event;
 
 /**
- * The mod_openai_chat course module viewed event class.
+ * The mod_intebchat course module viewed event class.
  *
- * @package    mod_openai_chat
+ * @package    mod_intebchat
  * @since      Moodle 2.7
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -43,7 +43,7 @@ class course_module_viewed extends \core\event\course_module_viewed {
     protected function init() {
         $this->data['crud'] = 'r';
         $this->data['edulevel'] = self::LEVEL_PARTICIPATING;
-        $this->data['objecttable'] = 'openai_chat';
+        $this->data['objecttable'] = 'intebchat';
     }
 
     /**
@@ -52,6 +52,6 @@ class course_module_viewed extends \core\event\course_module_viewed {
      * @return array
      */
     public static function get_objectid_mapping() {
-        return array('db' => 'openai_chat', 'restore' => 'openai_chat');
+        return array('db' => 'intebchat', 'restore' => 'intebchat');
     }
 }

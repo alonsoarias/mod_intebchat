@@ -14,9 +14,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Main JavaScript for OpenAI Chat module
+ * Main JavaScript for INTEB Chat module
  *
- * @module     mod_openai_chat/lib
+ * @module     mod_intebchat/lib
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
  * @copyright  Based on work by 2022 Bryce Yoder <me@bryceyoder.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -38,12 +38,12 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
 
         // Initialize local data storage if necessary
         if (api_type === 'assistant') {
-            chatData = localStorage.getItem("mod_openai_chat_data");
+            chatData = localStorage.getItem("mod_intebchat_data");
             if (chatData) {
                 chatData = JSON.parse(chatData);
                 if (chatData[instanceId] && chatData[instanceId]['threadId'] && persistConvo === "1") {
                     $.ajax({
-                        url: M.cfg.wwwroot + '/mod/openai_chat/api/thread.php?thread_id=' + chatData[instanceId]['threadId'],
+                        url: M.cfg.wwwroot + '/mod/intebchat/api/thread.php?thread_id=' + chatData[instanceId]['threadId'],
                         type: 'GET',
                         dataType: 'json',
                         success: function(data) {
@@ -54,7 +54,7 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
                         error: function() {
                             // Reset thread if error
                             chatData[instanceId] = {};
-                            localStorage.setItem("mod_openai_chat_data", JSON.stringify(chatData));
+                            localStorage.setItem("mod_intebchat_data", JSON.stringify(chatData));
                         }
                     });
                 } else {
@@ -63,11 +63,11 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
             } else {
                 chatData = {[instanceId]: {}};
             }
-            localStorage.setItem("mod_openai_chat_data", JSON.stringify(chatData));
+            localStorage.setItem("mod_intebchat_data", JSON.stringify(chatData));
         }
 
         // Event listeners
-        $(document).on('keyup', '.mod_openai_chat[data-instance-id="' + instanceId + '"] #openai_input', function(e) {
+        $(document).on('keyup', '.mod_intebchat[data-instance-id="' + instanceId + '"] #openai_input', function(e) {
             if (e.which === 13 && e.target.value !== "") {
                 addToChatLog('user', e.target.value, instanceId);
                 createCompletion(e.target.value, instanceId, api_type);
@@ -75,8 +75,8 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
             }
         });
 
-        $(document).on('click', '.mod_openai_chat[data-instance-id="' + instanceId + '"] #go', function(e) {
-            var input = $('.mod_openai_chat[data-instance-id="' + instanceId + '"] #openai_input');
+        $(document).on('click', '.mod_intebchat[data-instance-id="' + instanceId + '"] #go', function(e) {
+            var input = $('.mod_intebchat[data-instance-id="' + instanceId + '"] #openai_input');
             if (input.val() !== "") {
                 addToChatLog('user', input.val(), instanceId);
                 createCompletion(input.val(), instanceId, api_type);
@@ -84,7 +84,7 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
             }
         });
 
-        $(document).on('click', '.mod_openai_chat[data-instance-id="' + instanceId + '"] #refresh', function(e) {
+        $(document).on('click', '.mod_intebchat[data-instance-id="' + instanceId + '"] #refresh', function(e) {
             clearHistory(instanceId);
         });
 
@@ -92,11 +92,11 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
         var strings = [
             {
                 key: 'askaquestion',
-                component: 'mod_openai_chat'
+                component: 'mod_intebchat'
             },
             {
                 key: 'erroroccurred',
-                component: 'mod_openai_chat'
+                component: 'mod_intebchat'
             },
         ];
         Str.get_strings(strings).then(function(results) {
@@ -112,7 +112,7 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
      * @param {int} instanceId The ID of the instance to manipulate
      */
     var addToChatLog = function(type, message, instanceId) {
-        var messageContainer = $('.mod_openai_chat[data-instance-id="' + instanceId + '"] #openai_chat_log');
+        var messageContainer = $('.mod_intebchat[data-instance-id="' + instanceId + '"] #intebchat_log');
         
         var messageElem = $('<div></div>').addClass('openai_message').addClass(type);
         var messageText = $('<span></span>').html(message);
@@ -132,15 +132,15 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
      * @param {int} instanceId
      */
     var clearHistory = function(instanceId) {
-        chatData = localStorage.getItem("mod_openai_chat_data");
+        chatData = localStorage.getItem("mod_intebchat_data");
         if (chatData) {
             chatData = JSON.parse(chatData);
             if (chatData[instanceId]) {
                 chatData[instanceId] = {};
-                localStorage.setItem("mod_openai_chat_data", JSON.stringify(chatData));
+                localStorage.setItem("mod_intebchat_data", JSON.stringify(chatData));
             }
         }
-        $('.mod_openai_chat[data-instance-id="' + instanceId + '"] #openai_chat_log').html("");
+        $('.mod_intebchat[data-instance-id="' + instanceId + '"] #intebchat_log').html("");
     };
 
     /**
@@ -154,7 +154,7 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
         
         // If the type is assistant, attempt to fetch a thread ID
         if (api_type === 'assistant') {
-            chatData = localStorage.getItem("mod_openai_chat_data");
+            chatData = localStorage.getItem("mod_intebchat_data");
             if (chatData) {
                 chatData = JSON.parse(chatData);
                 if (chatData[instanceId]) {
@@ -167,14 +167,14 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
 
         var history = buildTranscript(instanceId);
 
-        $('.mod_openai_chat[data-instance-id="' + instanceId + '"] #control_bar').addClass('disabled');
-        $('.mod_openai_chat[data-instance-id="' + instanceId + '"] #openai_input').removeClass('error');
-        $('.mod_openai_chat[data-instance-id="' + instanceId + '"] #openai_input').attr('placeholder', questionString);
-        $('.mod_openai_chat[data-instance-id="' + instanceId + '"] #openai_input').blur();
+        $('.mod_intebchat[data-instance-id="' + instanceId + '"] #control_bar').addClass('disabled');
+        $('.mod_intebchat[data-instance-id="' + instanceId + '"] #openai_input').removeClass('error');
+        $('.mod_intebchat[data-instance-id="' + instanceId + '"] #openai_input').attr('placeholder', questionString);
+        $('.mod_intebchat[data-instance-id="' + instanceId + '"] #openai_input').blur();
         addToChatLog('bot loading', '...', instanceId);
 
         $.ajax({
-            url: M.cfg.wwwroot + '/mod/openai_chat/api/completion.php',
+            url: M.cfg.wwwroot + '/mod/intebchat/api/completion.php',
             type: 'POST',
             dataType: 'json',
             contentType: 'application/json',
@@ -185,27 +185,27 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
                 threadId: threadId
             }),
             success: function(data) {
-                var messageContainer = $('.mod_openai_chat[data-instance-id="' + instanceId + '"] #openai_chat_log');
+                var messageContainer = $('.mod_intebchat[data-instance-id="' + instanceId + '"] #intebchat_log');
                 messageContainer.children().last().remove();
-                $('.mod_openai_chat[data-instance-id="' + instanceId + '"] #control_bar').removeClass('disabled');
+                $('.mod_intebchat[data-instance-id="' + instanceId + '"] #control_bar').removeClass('disabled');
 
                 if (data.message) {
                     addToChatLog('bot', data.message, instanceId);
                     if (data.thread_id) {
                         chatData[instanceId]['threadId'] = data.thread_id;
-                        localStorage.setItem("mod_openai_chat_data", JSON.stringify(chatData));
+                        localStorage.setItem("mod_intebchat_data", JSON.stringify(chatData));
                     }
                 } else if (data.error) {
                     addToChatLog('bot', data.error.message, instanceId);
                 }
-                $('.mod_openai_chat[data-instance-id="' + instanceId + '"] #openai_input').focus();
+                $('.mod_intebchat[data-instance-id="' + instanceId + '"] #openai_input').focus();
             },
             error: function(xhr, status, error) {
-                var messageContainer = $('.mod_openai_chat[data-instance-id="' + instanceId + '"] #openai_chat_log');
+                var messageContainer = $('.mod_intebchat[data-instance-id="' + instanceId + '"] #intebchat_log');
                 messageContainer.children().last().remove();
-                $('.mod_openai_chat[data-instance-id="' + instanceId + '"] #control_bar').removeClass('disabled');
-                $('.mod_openai_chat[data-instance-id="' + instanceId + '"] #openai_input').addClass('error');
-                $('.mod_openai_chat[data-instance-id="' + instanceId + '"] #openai_input').attr('placeholder', errorString);
+                $('.mod_intebchat[data-instance-id="' + instanceId + '"] #control_bar').removeClass('disabled');
+                $('.mod_intebchat[data-instance-id="' + instanceId + '"] #openai_input').addClass('error');
+                $('.mod_intebchat[data-instance-id="' + instanceId + '"] #openai_input').attr('placeholder', errorString);
             }
         });
     };
@@ -217,8 +217,8 @@ define(['jquery', 'core/ajax', 'core/str', 'core/notification'], function($, Aja
      */
     var buildTranscript = function(instanceId) {
         var transcript = [];
-        $('.mod_openai_chat[data-instance-id="' + instanceId + '"] .openai_message').each(function(index, element) {
-            var messages = $('.mod_openai_chat[data-instance-id="' + instanceId + '"] .openai_message');
+        $('.mod_intebchat[data-instance-id="' + instanceId + '"] .openai_message').each(function(index, element) {
+            var messages = $('.mod_intebchat[data-instance-id="' + instanceId + '"] .openai_message');
             if (index === messages.length - 1) {
                 return;
             }

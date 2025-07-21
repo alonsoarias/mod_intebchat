@@ -17,18 +17,18 @@
 /**
  * Class providing completions for assistant API
  *
- * @package    mod_openai_chat
+ * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
  * @copyright  Based on work by 2023 Bryce Yoder <me@bryceyoder.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-namespace mod_openai_chat\completion;
+namespace mod_intebchat\completion;
 
-use mod_openai_chat\completion;
+use mod_intebchat\completion;
 defined('MOODLE_INTERNAL') || die;
 
-class assistant extends \mod_openai_chat\completion {
+class assistant extends \mod_intebchat\completion {
 
     private $thread_id;
 
@@ -131,7 +131,7 @@ class assistant extends \mod_openai_chat\completion {
             if ($iters >= 60) {
                 return [
                     "id" => 0,
-                    "message" => get_string('openaitimedout', 'mod_openai_chat'),
+                    "message" => get_string('openaitimedout', 'mod_intebchat'),
                     "thread_id" => 0
                 ];
             }

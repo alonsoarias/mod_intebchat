@@ -17,18 +17,18 @@
 /**
  * Class providing completions for chat models (3.5 and up)
  *
- * @package    mod_openai_chat
+ * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
  * @copyright  Based on work by 2023 Bryce Yoder <me@bryceyoder.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-namespace mod_openai_chat\completion;
+namespace mod_intebchat\completion;
 
-use mod_openai_chat\completion;
+use mod_intebchat\completion;
 defined('MOODLE_INTERNAL') || die;
 
-class chat extends \mod_openai_chat\completion {
+class chat extends \mod_intebchat\completion {
 
     public function __construct($model, $message, $history, $instance_settings, $thread_id = null) {
         parent::__construct($model, $message, $history, $instance_settings);
@@ -41,7 +41,7 @@ class chat extends \mod_openai_chat\completion {
     public function create_completion($context) {
         if ($this->sourceoftruth) {
             $this->sourceoftruth = format_string($this->sourceoftruth, true, ['context' => $context]);
-            $this->prompt .= get_string('sourceoftruthreinforcement', 'mod_openai_chat');
+            $this->prompt .= get_string('sourceoftruthreinforcement', 'mod_intebchat');
         }
         $this->prompt .= "\n\n";
 

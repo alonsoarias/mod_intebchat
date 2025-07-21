@@ -17,13 +17,13 @@
 /**
  * Log report table for individual activity
  *
- * @package    mod_openai_chat
+ * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
  * @copyright  Based on work by 2024 Bryce Yoder <me@bryceyoder.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use \mod_openai_chat\report;
+use \mod_intebchat\report;
 
 require_once('../../config.php');
 require_once($CFG->libdir.'/tablelib.php');
@@ -36,16 +36,16 @@ $starttime = optional_param('starttime', '', PARAM_TEXT);
 $endtime = optional_param('endtime', '', PARAM_TEXT);
 $tsort = optional_param('tsort', '', PARAM_TEXT);
 
-// Get course module, course, and openai_chat instance.
-$cm = get_coursemodule_from_id('openai_chat', $id, 0, false, MUST_EXIST);
+// Get course module, course, and intebchat instance.
+$cm = get_coursemodule_from_id('intebchat', $id, 0, false, MUST_EXIST);
 $course = $DB->get_record('course', array('id' => $cm->course), '*', MUST_EXIST);
-$openai_chat = $DB->get_record('openai_chat', array('id' => $cm->instance), '*', MUST_EXIST);
+$intebchat = $DB->get_record('intebchat', array('id' => $cm->instance), '*', MUST_EXIST);
 
 require_login($course, true, $cm);
 $context = context_module::instance($cm->id);
-require_capability('mod/openai_chat:viewreport', $context);
+require_capability('mod/intebchat:viewreport', $context);
 
-$pageurl = $CFG->wwwroot . "/mod/openai_chat/report.php?id=$id" .
+$pageurl = $CFG->wwwroot . "/mod/intebchat/report.php?id=$id" .
     "&user=$user" .
     "&starttime=$starttime" .
     "&endtime=$endtime";
@@ -54,34 +54,34 @@ $endtime_ts = strtotime($endtime);
 
 $PAGE->set_url($pageurl);
 $PAGE->set_pagelayout('report');
-$PAGE->set_title(format_string($openai_chat->name));
+$PAGE->set_title(format_string($intebchat->name));
 $PAGE->set_heading(format_string($course->fullname));
-$PAGE->navbar->add(get_string('openai_chat_logs', 'mod_openai_chat'));
+$PAGE->navbar->add(get_string('intebchat_logs', 'mod_intebchat'));
 
 $datetime = new DateTime();
-$table = new \mod_openai_chat\report(time());
+$table = new \mod_intebchat\report(time());
 $table->show_download_buttons_at(array(TABLE_P_BOTTOM));
 $table->is_downloading(
     $download, 
-    get_string('downloadfilename', 'mod_openai_chat') 
+    get_string('downloadfilename', 'mod_intebchat') 
         . '_' 
         . $datetime->format(DateTime::ATOM)
 );
 
 if (!$table->is_downloading()) {
     echo $OUTPUT->header();
-    echo $OUTPUT->heading(get_string('openai_chat_logs', 'mod_openai_chat'));
-    echo $OUTPUT->render_from_template('mod_openai_chat/report_page', [
+    echo $OUTPUT->heading(get_string('intebchat_logs', 'mod_intebchat'));
+    echo $OUTPUT->render_from_template('mod_intebchat/report_page', [
         "id" => $id,
         "user" => $user,
         "starttime" => $starttime,
         "endtime" => $endtime,
-        "link" => (new moodle_url("/mod/openai_chat/report.php"))->out()
+        "link" => (new moodle_url("/mod/intebchat/report.php"))->out()
     ]);
 }
 
 $where = "ocl.instanceid = :instanceid";
-$params = ['instanceid' => $openai_chat->id];
+$params = ['instanceid' => $intebchat->id];
 
 // Filter by user, starttime, endtime.
 if ($user) {
@@ -103,7 +103,7 @@ if (!$tsort) {
 
 $table->set_sql(
     "ocl.*, CONCAT(u.firstname, ' ', u.lastname) as user_name", 
-    "{mod_openai_chat_log} ocl 
+    "{mod_intebchat_log} ocl 
         JOIN {user} u ON u.id = ocl.userid",
     $where,
     $params

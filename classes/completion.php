@@ -17,13 +17,13 @@
 /**
  * Base completion object class
  *
- * @package    mod_openai_chat
+ * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
  * @copyright  Based on work by 2023 Bryce Yoder <me@bryceyoder.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
-namespace mod_openai_chat;
+namespace mod_intebchat;
 defined('MOODLE_INTERNAL') || die;
 
 class completion {
@@ -56,15 +56,15 @@ class completion {
     public function __construct($model, $message, $history, $instance_settings) {
         // Set default values
         $this->model = $model;
-        $this->apikey = get_config('mod_openai_chat', 'apikey');
+        $this->apikey = get_config('mod_intebchat', 'apikey');
 
         // We fetch defaults for both chat and assistant APIs, even though only one can be active at a time
         // In the past, multiple different completion classes shared API types, so this might happen again
         // Any settings that don't apply to the current API type are just ignored
 
-        $this->prompt = $this->get_setting('prompt', get_string('defaultprompt', 'mod_openai_chat'));
-        $this->assistantname = $this->get_setting('assistantname', get_string('defaultassistantname', 'mod_openai_chat'));
-        $this->username = $this->get_setting('username', get_string('defaultusername', 'mod_openai_chat'));
+        $this->prompt = $this->get_setting('prompt', get_string('defaultprompt', 'mod_intebchat'));
+        $this->assistantname = $this->get_setting('assistantname', get_string('defaultassistantname', 'mod_intebchat'));
+        $this->username = $this->get_setting('username', get_string('defaultusername', 'mod_intebchat'));
 
         $this->temperature = $this->get_setting('temperature', 0.5);
         $this->maxlength = $this->get_setting('maxlength', 500);
@@ -76,7 +76,7 @@ class completion {
         $this->instructions = $this->get_setting('instructions');
 
         // Then override with instance settings if applicable
-        if (get_config('mod_openai_chat', 'allowinstancesettings') === "1") {
+        if (get_config('mod_intebchat', 'allowinstancesettings') === "1") {
             foreach ($instance_settings as $name => $value) {
                 if ($value) {
                     $this->$name = $value;
@@ -97,7 +97,7 @@ class completion {
      * @return mixed: The saved or default value
      */
     protected function get_setting($settingname, $default_value = null) {
-        $setting = get_config('mod_openai_chat', $settingname);
+        $setting = get_config('mod_intebchat', $settingname);
         if (!$setting && $setting != 0) {
             $setting = $default_value;
         }
@@ -109,11 +109,11 @@ class completion {
      * @param string localsourceoftruth: The instance-level source of truth we got from the API call 
      */
     private function build_source_of_truth($localsourceoftruth) {
-        $sourceoftruth = get_config('mod_openai_chat', 'sourceoftruth');
+        $sourceoftruth = get_config('mod_intebchat', 'sourceoftruth');
     
         if ($sourceoftruth || $localsourceoftruth) {
             $sourceoftruth = 
-                get_string('sourceoftruthpreamble', 'mod_openai_chat')
+                get_string('sourceoftruthpreamble', 'mod_intebchat')
                 . $sourceoftruth . "\n\n"
                 . $localsourceoftruth . "\n\n";
             }

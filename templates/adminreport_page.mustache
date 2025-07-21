@@ -15,7 +15,7 @@
     along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 }}
 {{!
-    @template mod_openai_chat/adminreport_page
+    @template mod_intebchat/adminreport_page
 
     This template renders the admin report page form
 
@@ -30,7 +30,7 @@
     }
 }}
 
-<form class='mod_openai_chat' method='GET' action='{{link}}'>
+<form class='mod_intebchat' method='GET' action='{{link}}'>
     <div class='report_container'>
         <div style='display: flex; flex-direction: column'>
             <label for='courseid'>{{#str}}course{{/str}}</label>
@@ -41,15 +41,15 @@
             </select>
         </div>
         <div style='display: flex; flex-direction: column'>
-            <label for='user'>{{#str}}searchbyusername, mod_openai_chat{{/str}}</label>
-            <input name='user' type='text' value='{{user}}' placeholder='{{#str}}username, mod_openai_chat{{/str}}'/>
+            <label for='user'>{{#str}}searchbyusername, mod_intebchat{{/str}}</label>
+            <input name='user' type='text' value='{{user}}' placeholder='{{#str}}username, mod_intebchat{{/str}}'/>
         </div>
         <div style='display: flex; flex-direction: column'>
-            <label for='starttime'>{{#str}}starttime, mod_openai_chat{{/str}}</label>
+            <label for='starttime'>{{#str}}starttime, mod_intebchat{{/str}}</label>
             <input type='datetime-local' name='starttime' value='{{starttime}}' />
         </div>
         <div style='display: flex; flex-direction: column'>
-            <label for='endtime'>{{#str}}endtime, mod_openai_chat{{/str}}</label>
+            <label for='endtime'>{{#str}}endtime, mod_intebchat{{/str}}</label>
             <input type='datetime-local' name='endtime' value='{{endtime}}' />
         </div>
     </div>

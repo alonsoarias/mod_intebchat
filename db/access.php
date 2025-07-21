@@ -17,7 +17,7 @@
 /**
  * Plugin capabilities are defined here.
  *
- * @package    mod_openai_chat
+ * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
  * @copyright  Based on work by 2022 Bryce Yoder <me@bryceyoder.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,7 +26,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $capabilities = [
-    'mod/openai_chat:view' => [
+    'mod/intebchat:view' => [
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
         'archetypes' => [
@@ -38,7 +38,7 @@ $capabilities = [
         ]
     ],
 
-    'mod/openai_chat:addinstance' => [
+    'mod/intebchat:addinstance' => [
         'riskbitmask' => RISK_SPAM | RISK_XSS,
         'captype' => 'write',
         'contextlevel' => CONTEXT_COURSE,
@@ -49,7 +49,7 @@ $capabilities = [
         'clonepermissionsfrom' => 'moodle/course:manageactivities'
     ],
 
-    'mod/openai_chat:viewreport' => [
+    'mod/intebchat:viewreport' => [
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
         'contextlevel' => CONTEXT_MODULE,
@@ -60,7 +60,7 @@ $capabilities = [
         ]
     ],
 
-    'mod/openai_chat:viewallreports' => [
+    'mod/intebchat:viewallreports' => [
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,

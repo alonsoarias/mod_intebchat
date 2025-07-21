@@ -17,13 +17,13 @@
 /**
  * Log table for individual activity
  *
- * @package    mod_openai_chat
+ * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
  * @copyright  Based on work by 2024 Bryce Yoder <me@bryceyoder.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_openai_chat;
+namespace mod_intebchat;
 defined('MOODLE_INTERNAL') || die;
 
 class report extends \table_sql {
@@ -37,10 +37,10 @@ class report extends \table_sql {
 
         // Define the titles of columns to show in header.
         $headers = array(
-            get_string('userid', 'mod_openai_chat'), 
-            get_string('username', 'mod_openai_chat'), 
-            get_string('usermessage', 'mod_openai_chat'), 
-            get_string('airesponse', 'mod_openai_chat'), 
+            get_string('userid', 'mod_intebchat'), 
+            get_string('username', 'mod_intebchat'), 
+            get_string('usermessage', 'mod_intebchat'), 
+            get_string('airesponse', 'mod_intebchat'), 
             get_string('time')
         );
         $this->define_headers($headers);

@@ -17,21 +17,21 @@
 /**
  * API endpoint for retrieving GPT completion
  *
- * @package    mod_openai_chat
+ * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
  * @copyright  Based on work by 2023 Bryce Yoder <me@bryceyoder.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use \mod_openai_chat\completion;
+use \mod_intebchat\completion;
 
 require_once('../../../config.php');
 require_once($CFG->libdir . '/filelib.php');
-require_once($CFG->dirroot . '/mod/openai_chat/lib.php');
+require_once($CFG->dirroot . '/mod/intebchat/lib.php');
 
 global $DB, $PAGE;
 
-if (get_config('mod_openai_chat', 'restrictusage') !== "0") {
+if (get_config('mod_intebchat', 'restrictusage') !== "0") {
     require_login();
 }
 
@@ -47,9 +47,9 @@ $instance_id = clean_param($body['instanceId'], PARAM_INT, true);
 $thread_id = clean_param($body['threadId'], PARAM_NOTAGS, true);
 
 // Get the instance record
-$instance = $DB->get_record('openai_chat', ['id' => $instance_id], '*', MUST_EXIST);
+$instance = $DB->get_record('intebchat', ['id' => $instance_id], '*', MUST_EXIST);
 $course = $DB->get_record('course', ['id' => $instance->course], '*', MUST_EXIST);
-$cm = get_coursemodule_from_instance('openai_chat', $instance->id, $course->id, false, MUST_EXIST);
+$cm = get_coursemodule_from_instance('intebchat', $instance->id, $course->id, false, MUST_EXIST);
 
 $context = context_module::instance($cm->id);
 $PAGE->set_context($context);
@@ -80,9 +80,9 @@ foreach ($setting_names as $setting) {
 }
 
 $engine_class;
-$model = get_config('mod_openai_chat', 'model');
-$api_type = get_config('mod_openai_chat', 'type');
-$engine_class = "\mod_openai_chat\completion\\$api_type";
+$model = get_config('mod_intebchat', 'model');
+$api_type = get_config('mod_intebchat', 'type');
+$engine_class = "\mod_intebchat\completion\\$api_type";
 
 $completion = new $engine_class(...[$model, $message, $history, $instance_settings, $thread_id]);
 $response = $completion->create_completion($context);

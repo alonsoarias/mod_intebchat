@@ -17,7 +17,7 @@
 /**
  * API endpoint for retrieving thread history
  *
- * @package    mod_openai_chat
+ * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
  * @copyright  Based on work by 2023 Bryce Yoder <me@bryceyoder.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -25,14 +25,14 @@
 
 require_once('../../../config.php');
 require_once($CFG->libdir . '/filelib.php');
-require_once($CFG->dirroot . '/mod/openai_chat/lib.php');
+require_once($CFG->dirroot . '/mod/intebchat/lib.php');
 
-if (get_config('mod_openai_chat', 'restrictusage') !== "0") {
+if (get_config('mod_intebchat', 'restrictusage') !== "0") {
     require_login();
 }
 
 $thread_id = required_param('thread_id', PARAM_NOTAGS);
-$apikey = get_config('mod_openai_chat', 'apikey');
+$apikey = get_config('mod_intebchat', 'apikey');
 
 $curl = new \curl();
 $curl->setopt(array(

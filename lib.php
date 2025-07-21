@@ -17,7 +17,7 @@
 /**
  * Library of interface functions and constants.
  *
- * @package    mod_openai_chat
+ * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
  * @copyright  Based on work by 2022 Bryce Yoder <me@bryceyoder.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
  * @param string $feature FEATURE_xx constant for requested feature
  * @return mixed true if the feature is supported, null if unknown
  */
-function openai_chat_supports($feature) {
+function intebchat_supports($feature) {
     switch($feature) {
         case FEATURE_GROUPS:
             return true;
@@ -61,59 +61,59 @@ function openai_chat_supports($feature) {
 }
 
 /**
- * Saves a new instance of the openai_chat into the database
+ * Saves a new instance of the intebchat into the database
  *
  * Given an object containing all the necessary data,
  * (defined by the form in mod_form.php) this function
  * will create a new instance and return the id number
  * of the new instance.
  *
- * @param stdClass $openai_chat Submitted data from the form in mod_form.php
- * @param mod_openai_chat_mod_form $mform The form instance itself (if needed)
- * @return int The id of the newly inserted openai_chat record
+ * @param stdClass $intebchat Submitted data from the form in mod_form.php
+ * @param mod_intebchat_mod_form $mform The form instance itself (if needed)
+ * @return int The id of the newly inserted intebchat record
  */
-function openai_chat_add_instance(stdClass $openai_chat, mod_openai_chat_mod_form $mform = null) {
+function intebchat_add_instance(stdClass $intebchat, mod_intebchat_mod_form $mform = null) {
     global $DB;
 
-    $openai_chat->timecreated = time();
-    $openai_chat->timemodified = time();
+    $intebchat->timecreated = time();
+    $intebchat->timemodified = time();
 
     // Process standard intro fields.
-    if (!isset($openai_chat->intro)) {
-        $openai_chat->intro = '';
+    if (!isset($intebchat->intro)) {
+        $intebchat->intro = '';
     }
-    if (!isset($openai_chat->introformat)) {
-        $openai_chat->introformat = FORMAT_HTML;
+    if (!isset($intebchat->introformat)) {
+        $intebchat->introformat = FORMAT_HTML;
     }
 
     // Insert the record.
-    $openai_chat->id = $DB->insert_record('openai_chat', $openai_chat);
+    $intebchat->id = $DB->insert_record('intebchat', $intebchat);
 
-    return $openai_chat->id;
+    return $intebchat->id;
 }
 
 /**
- * Updates an instance of the openai_chat in the database
+ * Updates an instance of the intebchat in the database
  *
  * Given an object containing all the necessary data,
  * (defined by the form in mod_form.php) this function
  * will update an existing instance with new data.
  *
- * @param stdClass $openai_chat An object from the form in mod_form.php
- * @param mod_openai_chat_mod_form $mform The form instance itself (if needed)
+ * @param stdClass $intebchat An object from the form in mod_form.php
+ * @param mod_intebchat_mod_form $mform The form instance itself (if needed)
  * @return boolean Success/Fail
  */
-function openai_chat_update_instance(stdClass $openai_chat, mod_openai_chat_mod_form $mform = null) {
+function intebchat_update_instance(stdClass $intebchat, mod_intebchat_mod_form $mform = null) {
     global $DB;
 
-    $openai_chat->timemodified = time();
-    $openai_chat->id = $openai_chat->instance;
+    $intebchat->timemodified = time();
+    $intebchat->id = $intebchat->instance;
 
-    return $DB->update_record('openai_chat', $openai_chat);
+    return $DB->update_record('intebchat', $intebchat);
 }
 
 /**
- * Removes an instance of the openai_chat from the database
+ * Removes an instance of the intebchat from the database
  *
  * Given an ID of an instance of this module,
  * this function will permanently delete the instance
@@ -122,18 +122,18 @@ function openai_chat_update_instance(stdClass $openai_chat, mod_openai_chat_mod_
  * @param int $id Id of the module instance
  * @return boolean Success/Fail
  */
-function openai_chat_delete_instance($id) {
+function intebchat_delete_instance($id) {
     global $DB;
 
-    if (!$openai_chat = $DB->get_record('openai_chat', array('id' => $id))) {
+    if (!$intebchat = $DB->get_record('intebchat', array('id' => $id))) {
         return false;
     }
 
     // Delete all associated log entries.
-    $DB->delete_records('mod_openai_chat_log', array('instanceid' => $openai_chat->id));
+    $DB->delete_records('mod_intebchat_log', array('instanceid' => $intebchat->id));
 
     // Delete the instance itself.
-    $DB->delete_records('openai_chat', array('id' => $openai_chat->id));
+    $DB->delete_records('intebchat', array('id' => $intebchat->id));
 
     return true;
 }
@@ -149,20 +149,20 @@ function openai_chat_delete_instance($id) {
  * @param stdClass $course The course record
  * @param stdClass $user The user record
  * @param cm_info|stdClass $mod The course module info object or record
- * @param stdClass $openai_chat The openai_chat instance record
+ * @param stdClass $intebchat The intebchat instance record
  * @return stdClass|null
  */
-function openai_chat_user_outline($course, $user, $mod, $openai_chat) {
+function intebchat_user_outline($course, $user, $mod, $intebchat) {
     global $DB;
 
-    $logs = $DB->get_records('mod_openai_chat_log', 
-        array('instanceid' => $openai_chat->id, 'userid' => $user->id), 
+    $logs = $DB->get_records('mod_intebchat_log', 
+        array('instanceid' => $intebchat->id, 'userid' => $user->id), 
         'timecreated DESC', 'id, timecreated', 0, 1);
 
     if ($logs) {
         $log = reset($logs);
         $result = new stdClass();
-        $result->info = get_string('lastmessage', 'mod_openai_chat');
+        $result->info = get_string('lastmessage', 'mod_intebchat');
         $result->time = $log->timecreated;
         return $result;
     }
@@ -176,35 +176,35 @@ function openai_chat_user_outline($course, $user, $mod, $openai_chat) {
  * @param stdClass $course the current course record
  * @param stdClass $user the record of the user we are generating report for
  * @param cm_info $mod course module info
- * @param stdClass $openai_chat the module instance record
+ * @param stdClass $intebchat the module instance record
  * @return void, is supposed to echo directly
  */
-function openai_chat_user_complete($course, $user, $mod, $openai_chat) {
+function intebchat_user_complete($course, $user, $mod, $intebchat) {
     global $DB, $OUTPUT;
 
-    $logs = $DB->get_records('mod_openai_chat_log', 
-        array('instanceid' => $openai_chat->id, 'userid' => $user->id), 
+    $logs = $DB->get_records('mod_intebchat_log', 
+        array('instanceid' => $intebchat->id, 'userid' => $user->id), 
         'timecreated ASC', 'timecreated');
 
     if ($logs) {
-        echo $OUTPUT->heading(get_string('messagecount', 'mod_openai_chat', count($logs)));
-        echo '<p>'.get_string('firstmessage', 'mod_openai_chat').': '.userdate(reset($logs)->timecreated).'</p>';
-        echo '<p>'.get_string('lastmessage', 'mod_openai_chat').': '.userdate(end($logs)->timecreated).'</p>';
+        echo $OUTPUT->heading(get_string('messagecount', 'mod_intebchat', count($logs)));
+        echo '<p>'.get_string('firstmessage', 'mod_intebchat').': '.userdate(reset($logs)->timecreated).'</p>';
+        echo '<p>'.get_string('lastmessage', 'mod_intebchat').': '.userdate(end($logs)->timecreated).'</p>';
     } else {
-        echo '<p>'.get_string('nomessages', 'mod_openai_chat').'</p>';
+        echo '<p>'.get_string('nomessages', 'mod_intebchat').'</p>';
     }
 }
 
 /**
  * Given a course and a time, this module should find recent activity
- * that has occurred in openai_chat activities and print it out.
+ * that has occurred in intebchat activities and print it out.
  *
  * @param stdClass $course The course record
  * @param bool $viewfullnames Should we display full names
  * @param int $timestart Print activity since this timestamp
  * @return boolean True if anything was printed, otherwise false
  */
-function openai_chat_print_recent_activity($course, $viewfullnames, $timestart) {
+function intebchat_print_recent_activity($course, $viewfullnames, $timestart) {
     return false;
 }
 
@@ -213,7 +213,7 @@ function openai_chat_print_recent_activity($course, $viewfullnames, $timestart) 
  *
  * This callback function is supposed to populate the passed array with
  * custom activity records. These records are then rendered into HTML via
- * {@link openai_chat_print_recent_mod_activity()}.
+ * {@link intebchat_print_recent_mod_activity()}.
  *
  * Returns void, it adds items into $activities and increases $index.
  *
@@ -225,11 +225,11 @@ function openai_chat_print_recent_activity($course, $viewfullnames, $timestart) 
  * @param int $userid check for a particular user's activity only, defaults to 0 (all users)
  * @param int $groupid check for a particular group's activity only, defaults to 0 (all groups)
  */
-function openai_chat_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid=0, $groupid=0) {
+function intebchat_get_recent_mod_activity(&$activities, &$index, $timestart, $courseid, $cmid, $userid=0, $groupid=0) {
 }
 
 /**
- * Prints single activity item prepared by {@link openai_chat_get_recent_mod_activity()}
+ * Prints single activity item prepared by {@link intebchat_get_recent_mod_activity()}
  *
  * @param stdClass $activity activity record with added 'cmid' property
  * @param int $courseid the id of the course we produce the report for
@@ -237,7 +237,7 @@ function openai_chat_get_recent_mod_activity(&$activities, &$index, $timestart, 
  * @param array $modnames as returned by {@link get_module_types_names()}
  * @param bool $viewfullnames display users' full names
  */
-function openai_chat_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames) {
+function intebchat_print_recent_mod_activity($activity, $courseid, $detail, $modnames, $viewfullnames) {
 }
 
 /**
@@ -250,7 +250,7 @@ function openai_chat_print_recent_mod_activity($activity, $courseid, $detail, $m
  *
  * @return boolean
  */
-function openai_chat_cron () {
+function intebchat_cron () {
     return true;
 }
 
@@ -262,7 +262,7 @@ function openai_chat_cron () {
  *
  * @return array
  */
-function openai_chat_get_extra_capabilities() {
+function intebchat_get_extra_capabilities() {
     return array();
 }
 
@@ -279,14 +279,14 @@ function openai_chat_get_extra_capabilities() {
  * @param stdClass $context
  * @return array of [(string)filearea] => (string)description
  */
-function openai_chat_get_file_areas($course, $cm, $context) {
+function intebchat_get_file_areas($course, $cm, $context) {
     return array();
 }
 
 /**
- * File browsing support for openai_chat file areas
+ * File browsing support for intebchat file areas
  *
- * @package mod_openai_chat
+ * @package mod_intebchat
  * @category files
  *
  * @param file_browser $browser
@@ -300,25 +300,25 @@ function openai_chat_get_file_areas($course, $cm, $context) {
  * @param string $filename
  * @return file_info instance or null if not found
  */
-function openai_chat_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename) {
+function intebchat_get_file_info($browser, $areas, $course, $cm, $context, $filearea, $itemid, $filepath, $filename) {
     return null;
 }
 
 /**
- * Serves the files from the openai_chat file areas
+ * Serves the files from the intebchat file areas
  *
- * @package mod_openai_chat
+ * @package mod_intebchat
  * @category files
  *
  * @param stdClass $course the course object
  * @param stdClass $cm the course module object
- * @param stdClass $context the openai_chat's context
+ * @param stdClass $context the intebchat's context
  * @param string $filearea the name of the file area
  * @param array $args extra arguments (itemid, path)
  * @param bool $forcedownload whether or not force download
  * @param array $options additional options affecting the file serving
  */
-function openai_chat_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, array $options=array()) {
+function intebchat_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, array $options=array()) {
     if ($context->contextlevel != CONTEXT_MODULE) {
         send_file_not_found();
     }
@@ -331,48 +331,48 @@ function openai_chat_pluginfile($course, $cm, $context, $filearea, array $args, 
 /* Navigation API */
 
 /**
- * Extends the global navigation tree by adding openai_chat nodes if there is a relevant content
+ * Extends the global navigation tree by adding intebchat nodes if there is a relevant content
  *
  * This can be called by an AJAX request so do not rely on $PAGE as it might not be set up properly.
  *
- * @param navigation_node $navref An object representing the navigation tree node of the openai_chat module instance
+ * @param navigation_node $navref An object representing the navigation tree node of the intebchat module instance
  * @param stdClass $course current course record
- * @param stdClass $module current openai_chat instance record
+ * @param stdClass $module current intebchat instance record
  * @param cm_info $cm course module information
  */
-function openai_chat_extend_navigation(navigation_node $navref, stdClass $course, stdClass $module, cm_info $cm) {
+function intebchat_extend_navigation(navigation_node $navref, stdClass $course, stdClass $module, cm_info $cm) {
     global $PAGE;
     
-    if (has_capability('mod/openai_chat:viewreport', context_module::instance($cm->id))) {
-        $url = new moodle_url('/mod/openai_chat/report.php', array('id' => $cm->id));
-        $navref->add(get_string('viewreport', 'mod_openai_chat'), $url, navigation_node::TYPE_SETTING);
+    if (has_capability('mod/intebchat:viewreport', context_module::instance($cm->id))) {
+        $url = new moodle_url('/mod/intebchat/report.php', array('id' => $cm->id));
+        $navref->add(get_string('viewreport', 'mod_intebchat'), $url, navigation_node::TYPE_SETTING);
     }
 }
 
 /**
- * Extends the settings navigation with the openai_chat settings
+ * Extends the settings navigation with the intebchat settings
  *
- * This function is called when the context for the page is a openai_chat module. This is not called by AJAX
+ * This function is called when the context for the page is a intebchat module. This is not called by AJAX
  * so it is safe to rely on the $PAGE.
  *
  * @param settings_navigation $settingsnav complete settings navigation tree
- * @param navigation_node $openai_chatnode openai_chat administration node
+ * @param navigation_node $intebchatnode intebchat administration node
  */
-function openai_chat_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $openai_chatnode = null) {
+function intebchat_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $intebchatnode = null) {
     global $PAGE, $DB, $CFG;
 
-    if (!$openai_chatnode) {
+    if (!$intebchatnode) {
         return;
     }
 
-    if (has_capability('mod/openai_chat:viewreport', $PAGE->cm->context)) {
-        $url = new moodle_url('/mod/openai_chat/report.php', array('id' => $PAGE->cm->id));
-        $openai_chatnode->add(get_string('viewreport', 'mod_openai_chat'), $url, navigation_node::TYPE_SETTING);
+    if (has_capability('mod/intebchat:viewreport', $PAGE->cm->context)) {
+        $url = new moodle_url('/mod/intebchat/report.php', array('id' => $PAGE->cm->id));
+        $intebchatnode->add(get_string('viewreport', 'mod_intebchat'), $url, navigation_node::TYPE_SETTING);
     }
 
-    if (has_capability('mod/openai_chat:viewallreports', context_system::instance())) {
-        $url = new moodle_url('/mod/openai_chat/adminreport.php');
-        $openai_chatnode->add(get_string('viewallreports', 'mod_openai_chat'), $url, navigation_node::TYPE_SETTING);
+    if (has_capability('mod/intebchat:viewallreports', context_system::instance())) {
+        $url = new moodle_url('/mod/intebchat/adminreport.php');
+        $intebchatnode->add(get_string('viewallreports', 'mod_intebchat'), $url, navigation_node::TYPE_SETTING);
     }
 }
 
@@ -385,7 +385,7 @@ function openai_chat_extend_settings_navigation(settings_navigation $settingsnav
  * @return String: the API type (chat|azure|assistant)
  */
 function get_type_to_display() {
-    $stored_type = get_config('mod_openai_chat', 'type');
+    $stored_type = get_config('mod_intebchat', 'type');
     if ($stored_type) {
         return $stored_type;
     }
@@ -402,7 +402,7 @@ function fetch_assistants_array($apikey = null) {
     global $DB;
 
     if (!$apikey) {
-        $apikey = get_config('mod_openai_chat', 'apikey');
+        $apikey = get_config('mod_intebchat', 'apikey');
     }
 
     if (!$apikey) {
@@ -493,11 +493,11 @@ function get_models() {
 function log_message($instanceid, $usermessage, $airesponse, $context) {
     global $USER, $DB;
 
-    if (!get_config('mod_openai_chat', 'logging')) {
+    if (!get_config('mod_intebchat', 'logging')) {
         return;
     }
 
-    $DB->insert_record('mod_openai_chat_log', (object) [
+    $DB->insert_record('mod_intebchat_log', (object) [
         'instanceid' => $instanceid,
         'userid' => $USER->id,
         'usermessage' => $usermessage,
@@ -510,23 +510,23 @@ function log_message($instanceid, $usermessage, $airesponse, $context) {
 /**
  * Mark the activity completed (if required) and trigger the course_module_viewed event.
  *
- * @param  stdClass $openai_chat   openai_chat object
+ * @param  stdClass $intebchat   intebchat object
  * @param  stdClass $course     course object
  * @param  stdClass $cm         course module object
  * @param  stdClass $context    context object
  * @since Moodle 3.0
  */
-function openai_chat_view($openai_chat, $course, $cm, $context) {
+function intebchat_view($intebchat, $course, $cm, $context) {
     // Trigger course_module_viewed event.
     $params = array(
         'context' => $context,
-        'objectid' => $openai_chat->id
+        'objectid' => $intebchat->id
     );
 
-    $event = \mod_openai_chat\event\course_module_viewed::create($params);
+    $event = \mod_intebchat\event\course_module_viewed::create($params);
     $event->add_record_snapshot('course_modules', $cm);
     $event->add_record_snapshot('course', $course);
-    $event->add_record_snapshot('openai_chat', $openai_chat);
+    $event->add_record_snapshot('intebchat', $intebchat);
     $event->trigger();
 
     // Completion.

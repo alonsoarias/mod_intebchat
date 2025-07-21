@@ -17,13 +17,13 @@
 /**
  * Privacy API Provider
  *
- * @package    mod_openai_chat
+ * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
  * @copyright  Based on work by 2024 Bryce Yoder <me@bryceyoder.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_openai_chat\privacy;
+namespace mod_intebchat\privacy;
 
 use \core_privacy\local\metadata\collection;
 use \core_privacy\local\request\writer;
@@ -41,15 +41,15 @@ class provider implements
 
     public static function get_metadata(collection $collection): collection {
         $collection->add_database_table(
-            'mod_openai_chat_log',
+            'mod_intebchat_log',
              [
-                'userid' => 'privacy:metadata:openai_chat_log:userid',
-                'instanceid' => 'privacy:metadata:openai_chat_log:instanceid',
-                'usermessage' => 'privacy:metadata:openai_chat_log:usermessage',
-                'airesponse' => 'privacy:metadata:openai_chat_log:airesponse',
-                'timecreated' => 'privacy:metadata:openai_chat_log:timecreated'
+                'userid' => 'privacy:metadata:intebchat_log:userid',
+                'instanceid' => 'privacy:metadata:intebchat_log:instanceid',
+                'usermessage' => 'privacy:metadata:intebchat_log:usermessage',
+                'airesponse' => 'privacy:metadata:intebchat_log:airesponse',
+                'timecreated' => 'privacy:metadata:intebchat_log:timecreated'
              ],
-            'privacy:metadata:openai_chat_log'
+            'privacy:metadata:intebchat_log'
         );
     
         return $collection;
@@ -62,13 +62,13 @@ class provider implements
                   FROM {context} ctx
                   JOIN {course_modules} cm ON cm.id = ctx.instanceid AND ctx.contextlevel = :contextlevel
                   JOIN {modules} m ON m.id = cm.module AND m.name = :modname
-                  JOIN {openai_chat} oc ON oc.id = cm.instance
-                  JOIN {mod_openai_chat_log} ocl ON ocl.instanceid = oc.id
+                  JOIN {intebchat} oc ON oc.id = cm.instance
+                  JOIN {mod_intebchat_log} ocl ON ocl.instanceid = oc.id
                  WHERE ocl.userid = :userid";
         
         $params = [
             'contextlevel' => CONTEXT_MODULE,
-            'modname' => 'openai_chat',
+            'modname' => 'intebchat',
             'userid' => $userid
         ];
         
@@ -86,12 +86,12 @@ class provider implements
         $sql = "SELECT ocl.userid
                   FROM {course_modules} cm
                   JOIN {modules} m ON m.id = cm.module AND m.name = :modname
-                  JOIN {openai_chat} oc ON oc.id = cm.instance
-                  JOIN {mod_openai_chat_log} ocl ON ocl.instanceid = oc.id
+                  JOIN {intebchat} oc ON oc.id = cm.instance
+                  JOIN {mod_intebchat_log} ocl ON ocl.instanceid = oc.id
                  WHERE cm.id = :cmid";
 
         $params = [
-            'modname' => 'openai_chat',
+            'modname' => 'intebchat',
             'cmid' => $context->instanceid
         ];
 
@@ -110,14 +110,14 @@ class provider implements
             $userid = $user->id;
 
             // Get the course module.
-            $cm = get_coursemodule_from_id('openai_chat', $context->instanceid);
+            $cm = get_coursemodule_from_id('intebchat', $context->instanceid);
             if (!$cm) {
                 continue;
             }
 
             // Get messages.
             $sql = "SELECT id, userid, usermessage, airesponse, timecreated 
-                    FROM {mod_openai_chat_log} 
+                    FROM {mod_intebchat_log} 
                     WHERE instanceid = :instanceid AND userid = :userid
                     ORDER BY timecreated";
             
@@ -136,7 +136,7 @@ class provider implements
                 }
         
                 writer::with_context($context)->export_data(
-                    [get_string('privacy:chatmessagespath', 'mod_openai_chat')],
+                    [get_string('privacy:chatmessagespath', 'mod_intebchat')],
                     $messages
                 );
             }
@@ -150,12 +150,12 @@ class provider implements
             return;
         }
 
-        $cm = get_coursemodule_from_id('openai_chat', $context->instanceid);
+        $cm = get_coursemodule_from_id('intebchat', $context->instanceid);
         if (!$cm) {
             return;
         }
 
-        $DB->delete_records('mod_openai_chat_log', ['instanceid' => $cm->instance]);
+        $DB->delete_records('mod_intebchat_log', ['instanceid' => $cm->instance]);
     }
 
     public static function delete_data_for_user(approved_contextlist $contextlist) {
@@ -168,12 +168,12 @@ class provider implements
                 continue;
             }
 
-            $cm = get_coursemodule_from_id('openai_chat', $context->instanceid);
+            $cm = get_coursemodule_from_id('intebchat', $context->instanceid);
             if (!$cm) {
                 continue;
             }
 
-            $DB->delete_records('mod_openai_chat_log', ['instanceid' => $cm->instance, 'userid' => $userid]);
+            $DB->delete_records('mod_intebchat_log', ['instanceid' => $cm->instance, 'userid' => $userid]);
         }
     }
 
@@ -185,7 +185,7 @@ class provider implements
             return;
         }
 
-        $cm = get_coursemodule_from_id('openai_chat', $context->instanceid);
+        $cm = get_coursemodule_from_id('intebchat', $context->instanceid);
         if (!$cm) {
             return;
         }
@@ -194,6 +194,6 @@ class provider implements
         list($usersql, $userparams) = $DB->get_in_or_equal($userids, SQL_PARAMS_NAMED);
         
         $params = ['instanceid' => $cm->instance] + $userparams;
-        $DB->delete_records_select('mod_openai_chat_log', "instanceid = :instanceid AND userid $usersql", $params);
+        $DB->delete_records_select('mod_intebchat_log', "instanceid = :instanceid AND userid $usersql", $params);
     }
 }

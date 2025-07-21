@@ -17,7 +17,7 @@
 /**
  * Plugin upgrade steps are defined here.
  *
- * @package    mod_openai_chat
+ * @package    mod_intebchat
  * @category   upgrade
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -26,12 +26,12 @@
 defined('MOODLE_INTERNAL') || die();
 
 /**
- * Execute mod_openai_chat upgrade from the given old version.
+ * Execute mod_intebchat upgrade from the given old version.
  *
  * @param int $oldversion
  * @return bool
  */
-function xmldb_openai_chat_upgrade($oldversion) {
+function xmldb_intebchat_upgrade($oldversion) {
     global $DB;
 
     $dbman = $DB->get_manager();

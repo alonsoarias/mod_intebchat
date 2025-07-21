@@ -17,13 +17,13 @@
 /**
  * Global log report table for administrators
  *
- * @package    mod_openai_chat
+ * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
  * @copyright  Based on work by 2024 Bryce Yoder <me@bryceyoder.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-use \mod_openai_chat\adminreport;
+use \mod_intebchat\adminreport;
 
 require_once('../../config.php');
 require_once($CFG->libdir.'/tablelib.php');
@@ -31,7 +31,7 @@ require_once($CFG->libdir.'/adminlib.php');
 global $DB;
 
 require_login();
-require_capability('mod/openai_chat:viewallreports', context_system::instance());
+require_capability('mod/intebchat:viewallreports', context_system::instance());
 
 $courseid = optional_param('courseid', 0, PARAM_INT);
 $download = optional_param('download', '', PARAM_ALPHA);
@@ -40,7 +40,7 @@ $starttime = optional_param('starttime', '', PARAM_TEXT);
 $endtime = optional_param('endtime', '', PARAM_TEXT);
 $tsort = optional_param('tsort', '', PARAM_TEXT);
 
-$pageurl = $CFG->wwwroot . "/mod/openai_chat/adminreport.php?" .
+$pageurl = $CFG->wwwroot . "/mod/intebchat/adminreport.php?" .
     "courseid=$courseid" .
     "&user=$user" .
     "&starttime=$starttime" .
@@ -50,37 +50,37 @@ $endtime_ts = strtotime($endtime);
 
 $PAGE->set_url($pageurl);
 $PAGE->set_pagelayout('admin');
-$PAGE->set_title(get_string('openai_chat_logs', 'mod_openai_chat'));
-$PAGE->set_heading(get_string('openai_chat_logs', 'mod_openai_chat'));
+$PAGE->set_title(get_string('intebchat_logs', 'mod_intebchat'));
+$PAGE->set_heading(get_string('intebchat_logs', 'mod_intebchat'));
 
-admin_externalpage_setup('mod_openai_chat_report');
+admin_externalpage_setup('mod_intebchat_report');
 
 $datetime = new DateTime();
-$table = new \mod_openai_chat\adminreport(time());
+$table = new \mod_intebchat\adminreport(time());
 $table->show_download_buttons_at(array(TABLE_P_BOTTOM));
 $table->is_downloading(
     $download, 
-    get_string('downloadfilename', 'mod_openai_chat') 
+    get_string('downloadfilename', 'mod_intebchat') 
         . '_admin_' 
         . $datetime->format(DateTime::ATOM)
 );
 
 if (!$table->is_downloading()) {
     echo $OUTPUT->header();
-    echo $OUTPUT->heading(get_string('openai_chat_logs', 'mod_openai_chat') . ' - ' . get_string('administration'));
+    echo $OUTPUT->heading(get_string('intebchat_logs', 'mod_intebchat') . ' - ' . get_string('administration'));
     
     // Get courses for filter.
     $courses = $DB->get_records_menu('course', null, 'fullname', 'id, fullname');
     $courses[0] = get_string('all');
     ksort($courses);
     
-    echo $OUTPUT->render_from_template('mod_openai_chat/adminreport_page', [
+    echo $OUTPUT->render_from_template('mod_intebchat/adminreport_page', [
         "courseid" => $courseid,
         "courses" => $courses,
         "user" => $user,
         "starttime" => $starttime,
         "endtime" => $endtime,
-        "link" => (new moodle_url("/mod/openai_chat/adminreport.php"))->out()
+        "link" => (new moodle_url("/mod/intebchat/adminreport.php"))->out()
     ]);
 }
 
@@ -113,9 +113,9 @@ if (!$tsort) {
 
 $table->set_sql(
     "ocl.*, CONCAT(u.firstname, ' ', u.lastname) as user_name, c.fullname as course_name, oc.name as activity_name", 
-    "{mod_openai_chat_log} ocl 
+    "{mod_intebchat_log} ocl 
         JOIN {user} u ON u.id = ocl.userid
-        JOIN {openai_chat} oc ON oc.id = ocl.instanceid
+        JOIN {intebchat} oc ON oc.id = ocl.instanceid
         JOIN {course} c ON c.id = oc.course",
     $where,
     $params

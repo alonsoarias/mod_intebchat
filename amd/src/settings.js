@@ -16,7 +16,7 @@
 /**
  * Settings page JavaScript
  *
- * @module     mod_openai_chat/settings
+ * @module     mod_intebchat/settings
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
  * @copyright  Based on work by 2022 Bryce Yoder <me@bryceyoder.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -24,9 +24,9 @@
 
 define(['jquery'], function($) {
     var init = function() {
-        $('#id_s_mod_openai_chat_type').on('change', function(e) {
+        $('#id_s_mod_intebchat_type').on('change', function(e) {
             // If the API Type is changed, programmatically hit save so the page automatically reloads with the new options
-            $('.settingsform').addClass('mod_openai_chat');
+            $('.settingsform').addClass('mod_intebchat');
             $('.settingsform').addClass('disabled');
             $('.settingsform button[type="submit"]').click();
         });

@@ -20,7 +20,7 @@
  * You can have a rather longer description of the file as well,
  * if you like, and it can span multiple lines.
  *
- * @package    mod_openai_chat
+ * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
  * @copyright  Based on work by 2022 Bryce Yoder <me@bryceyoder.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -37,24 +37,24 @@ require_course_login($course);
 
 $coursecontext = context_course::instance($course->id);
 
-$event = \mod_openai_chat\event\course_module_instance_list_viewed::create(array(
+$event = \mod_intebchat\event\course_module_instance_list_viewed::create(array(
     'context' => $coursecontext
 ));
 $event->add_record_snapshot('course', $course);
 $event->trigger();
 
-$PAGE->set_url('/mod/openai_chat/index.php', array('id' => $id));
+$PAGE->set_url('/mod/intebchat/index.php', array('id' => $id));
 $PAGE->set_title(format_string($course->fullname));
 $PAGE->set_heading(format_string($course->fullname));
 $PAGE->set_context($coursecontext);
 
 echo $OUTPUT->header();
 
-$modulenameplural = get_string('modulenameplural', 'mod_openai_chat');
+$modulenameplural = get_string('modulenameplural', 'mod_intebchat');
 echo $OUTPUT->heading($modulenameplural);
 
-if (!$openai_chats = get_all_instances_in_course('openai_chat', $course)) {
-    notice(get_string('noopenaichats', 'mod_openai_chat'), new moodle_url('/course/view.php', array('id' => $course->id)));
+if (!$intebchats = get_all_instances_in_course('intebchat', $course)) {
+    notice(get_string('noopenaichats', 'mod_intebchat'), new moodle_url('/course/view.php', array('id' => $course->id)));
 }
 
 $table = new html_table();
@@ -69,20 +69,20 @@ if ($course->format == 'weeks') {
     $table->align = array('left', 'left');
 }
 
-foreach ($openai_chats as $openai_chat) {
-    if (!$openai_chat->visible) {
+foreach ($intebchats as $intebchat) {
+    if (!$intebchat->visible) {
         $link = html_writer::link(
-            new moodle_url('/mod/openai_chat/view.php', array('id' => $openai_chat->coursemodule)),
-            format_string($openai_chat->name, true),
+            new moodle_url('/mod/intebchat/view.php', array('id' => $intebchat->coursemodule)),
+            format_string($intebchat->name, true),
             array('class' => 'dimmed'));
     } else {
         $link = html_writer::link(
-            new moodle_url('/mod/openai_chat/view.php', array('id' => $openai_chat->coursemodule)),
-            format_string($openai_chat->name, true));
+            new moodle_url('/mod/intebchat/view.php', array('id' => $intebchat->coursemodule)),
+            format_string($intebchat->name, true));
     }
 
     if ($course->format == 'weeks' or $course->format == 'topics') {
-        $table->data[] = array($openai_chat->section, $link);
+        $table->data[] = array($intebchat->section, $link);
     } else {
         $table->data[] = array($link);
     }
