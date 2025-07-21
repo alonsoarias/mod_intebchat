@@ -19,7 +19,7 @@
  *
  * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
- * @copyright  Based on work by 2023 Bryce Yoder <me@bryceyoder.com>
+ * @copyright  Based on work by 2022 Bryce Yoder <me@bryceyoder.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 

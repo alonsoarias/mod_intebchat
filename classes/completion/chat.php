@@ -19,7 +19,6 @@
  *
  * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
- * @copyright  Based on work by 2023 Bryce Yoder <me@bryceyoder.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
 */
 
@@ -36,7 +35,7 @@ class chat extends \mod_intebchat\completion {
 
     /**
      * Given everything we know after constructing the parent, create a completion by constructing the prompt and making the api call
-     * @return JSON: The API response from OpenAI
+     * @return array The API response including message and token usage
      */
     public function create_completion($context) {
         if ($this->sourceoftruth) {
@@ -47,7 +46,9 @@ class chat extends \mod_intebchat\completion {
 
         $history_json = $this->format_history();
         array_unshift($history_json, ["role" => "system", "content" => $this->prompt]);
-        array_unshift($history_json, ["role" => "system", "content" => $this->sourceoftruth]);
+        if ($this->sourceoftruth) {
+            array_unshift($history_json, ["role" => "system", "content" => $this->sourceoftruth]);
+        }
 
         array_push($history_json, ["role" => "user", "content" => $this->message]);
 
@@ -57,7 +58,7 @@ class chat extends \mod_intebchat\completion {
 
     /**
      * Format the history JSON into a string that we can pass in the prompt
-     * @return string: The string representing the chat history to add to the prompt
+     * @return array The array representing the chat history
      */
     protected function format_history() {
         $history = [];
@@ -70,7 +71,7 @@ class chat extends \mod_intebchat\completion {
 
     /**
      * Make the actual API call to OpenAI
-     * @return JSON: The response from OpenAI
+     * @return array The response from OpenAI including token usage
      */
     private function make_api_call($history) {
         $curlbody = [
@@ -95,16 +96,26 @@ class chat extends \mod_intebchat\completion {
         $response = $curl->post("https://api.openai.com/v1/chat/completions", json_encode($curlbody));
         $response = json_decode($response);
 
-        $message = null;
+        $result = [];
+        
         if (property_exists($response, 'error')) {
-            $message = 'ERROR: ' . $response->error->message;
+            $result['error'] = ['message' => 'ERROR: ' . $response->error->message];
+            $result['id'] = 'error';
+            $result['message'] = null;
         } else {
-            $message = $response->choices[0]->message->content;
+            $result['id'] = property_exists($response, 'id') ? $response->id : 'unknown';
+            $result['message'] = $response->choices[0]->message->content;
+            
+            // Include token usage information if available
+            if (property_exists($response, 'usage')) {
+                $result['usage'] = [
+                    'prompt_tokens' => $response->usage->prompt_tokens,
+                    'completion_tokens' => $response->usage->completion_tokens,
+                    'total_tokens' => $response->usage->total_tokens
+                ];
+            }
         }
 
-        return [
-            "id" => property_exists($response, 'id') ? $response->id : 'error',
-            "message" => $message
-        ];
+        return $result;
     }
 }

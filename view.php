@@ -17,9 +17,6 @@
 /**
  * Prints a particular instance of intebchat
  *
- * You can have a rather longer description of the file as well,
- * if you like, and it can span multiple lines.
- *
  * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
  * @copyright  Based on work by 2022 Bryce Yoder <me@bryceyoder.com>
@@ -29,8 +26,8 @@
 require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
 require_once(dirname(__FILE__).'/lib.php');
 
-$id = optional_param('id', 0, PARAM_INT); // Course_module ID, or
-$n  = optional_param('n', 0, PARAM_INT);  // ... intebchat instance ID - it should be named as the first character of the module.
+$id = optional_param('id', 0, PARAM_INT); // Course_module ID
+$n  = optional_param('n', 0, PARAM_INT);  // intebchat instance ID
 
 if ($id) {
     $cm         = get_coursemodule_from_id('intebchat', $id, 0, false, MUST_EXIST);
@@ -60,38 +57,45 @@ $PAGE->set_title(format_string($intebchat->name));
 $PAGE->set_heading(format_string($course->fullname));
 
 // Check if API key is configured.
-$apikey_configured = false;
 $config = get_config('mod_intebchat');
-if (!empty($config->apikey) || (!empty($intebchat->apikey) && $config->allowinstancesettings)) {
-    $apikey_configured = true;
-}
+$apiconfig = intebchat_get_api_config($intebchat);
+$apikey_configured = !empty($apiconfig['apikey']);
 
-// Prepare data for JavaScript.
-$persistconvo = $config->persistconvo;
-if (!empty($intebchat->persistconvo) && $config->allowinstancesettings) {
-    $persistconvo = $intebchat->persistconvo;
-}
+// Check token limit for current user
+$token_limit_info = intebchat_check_token_limit($USER->id);
 
-$api_type = $config->type ? $config->type : 'chat';
+// Prepare data for JavaScript
+$persistconvo = $intebchat->persistconvo && $config->allowinstancesettings ? $intebchat->persistconvo : $config->persistconvo;
+$api_type = $intebchat->apitype ?: $config->type;
 
-// Pass data to JavaScript.
-$PAGE->requires->js_call_amd('mod_intebchat/lib', 'init', [[
+// Pass data to JavaScript
+$jsdata = [
     'instanceId' => $intebchat->id,
     'api_type' => $api_type,
-    'persistConvo' => $persistconvo
-]]);
+    'persistConvo' => $persistconvo,
+    'tokenLimitEnabled' => !empty($config->enabletokenlimit),
+    'tokenLimit' => $token_limit_info['limit'],
+    'tokensUsed' => $token_limit_info['used'],
+    'tokenLimitExceeded' => !$token_limit_info['allowed'],
+    'resetTime' => $token_limit_info['reset_time']
+];
 
-// Output starts here.
+$PAGE->requires->js_call_amd('mod_intebchat/lib', 'init', [$jsdata]);
+
+// Add modern CSS
+$PAGE->requires->css('/mod/intebchat/styles.css');
+
+// Output starts here
 echo $OUTPUT->header();
 
-// Show activity name and description.
+// Show activity name and description
 echo $OUTPUT->heading($intebchat->name);
 
 if ($intebchat->intro) {
     echo $OUTPUT->box(format_module_intro('intebchat', $intebchat, $cm->id), 'generalbox mod_introbox', 'intebchatintro');
 }
 
-// Determine name labels.
+// Determine name labels visibility
 $showlabelscss = '';
 if (!$intebchat->showlabels) {
     $showlabelscss = '
@@ -104,59 +108,82 @@ if (!$intebchat->showlabels) {
     ';
 }
 
-// Get assistant and user names.
-$assistantname = $config->assistantname ? $config->assistantname : get_string('defaultassistantname', 'mod_intebchat');
-$username = $config->username ? $config->username : get_string('defaultusername', 'mod_intebchat');
-
-// Override with instance settings if available.
-if ($config->allowinstancesettings) {
-    if (!empty($intebchat->assistantname)) {
-        $assistantname = $intebchat->assistantname;
-    }
-    if (!empty($intebchat->username)) {
-        $username = $intebchat->username;
-    }
-}
+// Get assistant and user names
+$assistantname = $intebchat->assistantname ?: ($config->assistantname ?: get_string('defaultassistantname', 'mod_intebchat'));
+$username = $intebchat->username ?: ($config->username ?: get_string('defaultusername', 'mod_intebchat'));
 
 $assistantname = format_string($assistantname, true, ['context' => $PAGE->context]);
 $username = format_string($username, true, ['context' => $PAGE->context]);
 
-// Chat interface HTML.
+// Chat interface HTML
 ?>
 <div class="mod_intebchat" data-instance-id="<?php echo $intebchat->id; ?>">
     <script>
-        var assistantName = "<?php echo $assistantname; ?>";
-        var userName = "<?php echo $username; ?>";
+        var assistantName = "<?php echo addslashes($assistantname); ?>";
+        var userName = "<?php echo addslashes($username); ?>";
     </script>
 
     <style>
         <?php echo $showlabelscss; ?>
         .openai_message.user:before {
-            content: "<?php echo $username; ?>";
+            content: "<?php echo addslashes($username); ?>";
         }
         .openai_message.bot:before {
-            content: "<?php echo $assistantname; ?>";
+            content: "<?php echo addslashes($assistantname); ?>";
         }
     </style>
 
-    <?php if ($apikey_configured): ?>
-        <div id="intebchat_log" role="log"></div>
+    <?php if (!$apikey_configured): ?>
+        <div class="alert alert-danger">
+            <i class="fa fa-exclamation-triangle"></i> <?php echo get_string('apikeymissing', 'mod_intebchat'); ?>
+        </div>
+    <?php elseif ($token_limit_info['tokenLimitExceeded']): ?>
+        <div class="alert alert-warning">
+            <i class="fa fa-exclamation-circle"></i> 
+            <?php echo get_string('tokenlimitexceeded', 'mod_intebchat', [
+                'used' => $token_limit_info['used'],
+                'limit' => $token_limit_info['limit'],
+                'reset' => userdate($token_limit_info['reset_time'])
+            ]); ?>
+        </div>
+    <?php else: ?>
+        <?php if (!empty($config->enabletokenlimit)): ?>
+            <div class="token-usage-info">
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" 
+                         style="width: <?php echo ($token_limit_info['used'] / $token_limit_info['limit'] * 100); ?>%"
+                         aria-valuenow="<?php echo $token_limit_info['used']; ?>" 
+                         aria-valuemin="0" 
+                         aria-valuemax="<?php echo $token_limit_info['limit']; ?>">
+                        <?php echo get_string('tokensused', 'mod_intebchat', [
+                            'used' => $token_limit_info['used'],
+                            'limit' => $token_limit_info['limit']
+                        ]); ?>
+                    </div>
+                </div>
+            </div>
+        <?php endif; ?>
+
+        <div id="intebchat_log" role="log" aria-live="polite"></div>
+        
         <div id="control_bar">
             <?php if ($config->logging): ?>
-                <div class="alert alert-info">
-                    <?php echo get_string('loggingenabled', 'mod_intebchat'); ?>
+                <div class="logging-info">
+                    <i class="fa fa-info-circle"></i> <?php echo get_string('loggingenabled', 'mod_intebchat'); ?>
                 </div>
             <?php endif; ?>
+            
             <div class="openai_input_bar" id="input_bar">
                 <textarea aria-label="<?php echo get_string('askaquestion', 'mod_intebchat'); ?>" 
-                          rows="1" 
+                          rows="2" 
                           id="openai_input" 
                           placeholder="<?php echo get_string('askaquestion', 'mod_intebchat'); ?>" 
-                          type="text" 
-                          name="message"></textarea>
+                          name="message"
+                          <?php echo !$token_limit_info['allowed'] ? 'disabled' : ''; ?>></textarea>
                 <button class='openai_input_submit_btn btn btn-primary' 
                         title="<?php echo get_string('askaquestion', 'mod_intebchat'); ?>" 
-                        id="go">
+                        id="go"
+                        <?php echo !$token_limit_info['allowed'] ? 'disabled' : ''; ?>>
                     <i class="fa fa-paper-plane"></i>
                 </button>
             </div>
@@ -166,13 +193,18 @@ $username = format_string($username, true, ['context' => $PAGE->context]);
                 <i class="fa fa-sync"></i>
             </button>
         </div>
-    <?php else: ?>
-        <div class="alert alert-danger">
-            <?php echo get_string('apikeymissing', 'mod_intebchat'); ?>
-        </div>
     <?php endif; ?>
 </div>
 
 <?php
-// Finish the page.
+// Show report link if user has capability
+if (has_capability('mod/intebchat:viewreport', context_module::instance($cm->id))) {
+    echo '<div class="mt-3">';
+    echo '<a href="' . new moodle_url('/mod/intebchat/report.php', array('id' => $cm->id)) . '" class="btn btn-info">';
+    echo '<i class="fa fa-chart-bar"></i> ' . get_string('viewreport', 'mod_intebchat');
+    echo '</a>';
+    echo '</div>';
+}
+
+// Finish the page
 echo $OUTPUT->footer();

@@ -19,7 +19,6 @@
  *
  * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
- * @copyright  Based on work by 2023 Bryce Yoder <me@bryceyoder.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -29,7 +28,7 @@ require_once('../../../config.php');
 require_once($CFG->libdir . '/filelib.php');
 require_once($CFG->dirroot . '/mod/intebchat/lib.php');
 
-global $DB, $PAGE;
+global $DB, $PAGE, $USER;
 
 if (get_config('mod_intebchat', 'restrictusage') !== "0") {
     require_login();
@@ -54,6 +53,28 @@ $cm = get_coursemodule_from_instance('intebchat', $instance->id, $course->id, fa
 $context = context_module::instance($cm->id);
 $PAGE->set_context($context);
 
+// Check token limit before processing
+$config = get_config('mod_intebchat');
+if (!empty($config->enabletokenlimit)) {
+    $token_limit_info = intebchat_check_token_limit($USER->id);
+    
+    if (!$token_limit_info['allowed']) {
+        $response = [
+            'error' => [
+                'type' => 'token_limit_exceeded',
+                'message' => get_string('tokenlimitexceeded', 'mod_intebchat', [
+                    'used' => $token_limit_info['used'],
+                    'limit' => $token_limit_info['limit'],
+                    'reset' => userdate($token_limit_info['reset_time'])
+                ])
+            ]
+        ];
+        header('Content-Type: application/json');
+        echo json_encode($response);
+        exit;
+    }
+}
+
 // Prepare instance settings
 $instance_settings = [];
 $setting_names = [
@@ -69,7 +90,10 @@ $setting_names = [
     'topp', 
     'frequency', 
     'presence',
-    'assistant'
+    'assistant',
+    'resourcename',
+    'deploymentid',
+    'apiversion'
 ];
 foreach ($setting_names as $setting) {
     if (property_exists($instance, $setting)) {
@@ -79,19 +103,69 @@ foreach ($setting_names as $setting) {
     }
 }
 
-$engine_class;
-$model = get_config('mod_intebchat', 'model');
-$api_type = get_config('mod_intebchat', 'type');
+// Get API configuration
+$apiconfig = intebchat_get_api_config($instance);
+$api_type = $instance->apitype ?: $config->type;
+$model = $apiconfig['model'];
+
+// Validate API key
+if (empty($apiconfig['apikey'])) {
+    $response = [
+        'error' => [
+            'type' => 'configuration_error',
+            'message' => get_string('apikeymissing', 'mod_intebchat')
+        ]
+    ];
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit;
+}
+
+// Create completion engine
 $engine_class = "\mod_intebchat\completion\\$api_type";
 
-$completion = new $engine_class(...[$model, $message, $history, $instance_settings, $thread_id]);
-$response = $completion->create_completion($context);
+if (!class_exists($engine_class)) {
+    $response = [
+        'error' => [
+            'type' => 'configuration_error',
+            'message' => 'Invalid API type configuration'
+        ]
+    ];
+    header('Content-Type: application/json');
+    echo json_encode($response);
+    exit;
+}
 
-// Format the markdown of each completion message into HTML.
-$response["message"] = format_text($response["message"], FORMAT_MARKDOWN, ['context' => $context]);
+try {
+    $completion = new $engine_class($model, $message, $history, $instance_settings, $thread_id);
+    $response = $completion->create_completion($context);
 
-// Log the message
-log_message($instance_id, $message, $response['message'], $context);
+    // Format the markdown of each completion message into HTML.
+    $response["message"] = format_text($response["message"], FORMAT_MARKDOWN, ['context' => $context]);
 
-$response = json_encode($response);
-echo $response;
+    // Extract token information if available
+    $tokeninfo = null;
+    if (isset($response['usage'])) {
+        $tokeninfo = [
+            'prompt' => $response['usage']['prompt_tokens'] ?? 0,
+            'completion' => $response['usage']['completion_tokens'] ?? 0,
+            'total' => $response['usage']['total_tokens'] ?? 0
+        ];
+        $response['tokenInfo'] = $tokeninfo;
+        unset($response['usage']); // Remove internal usage data from response
+    }
+
+    // Log the message with token info
+    log_message($instance_id, $message, $response['message'], $context, $tokeninfo);
+
+} catch (Exception $e) {
+    $response = [
+        'error' => [
+            'type' => 'api_error',
+            'message' => $e->getMessage()
+        ]
+    ];
+}
+
+header('Content-Type: application/json');
+echo json_encode($response);

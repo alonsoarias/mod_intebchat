@@ -19,7 +19,6 @@
  *
  * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
- * @copyright  Based on work by 2024 Bryce Yoder <me@bryceyoder.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -27,22 +26,38 @@ namespace mod_intebchat;
 defined('MOODLE_INTERNAL') || die;
 
 class report extends \table_sql {
+    protected $showTokens = false;
+    
     function __construct($uniqueid) {
         parent::__construct($uniqueid);
-        // Define the list of columns to show.
-        $columns = array('userid', 'user_name', 'usermessage', 'airesponse', 'timecreated');
+        
+        // Check if token tracking is enabled
+        $config = get_config('mod_intebchat');
+        $this->showTokens = !empty($config->enabletokenlimit);
+        
+        // Define the list of columns to show
+        $columns = array('userid', 'user_name', 'usermessage', 'airesponse');
+        if ($this->showTokens) {
+            $columns[] = 'totaltokens';
+        }
+        $columns[] = 'timecreated';
+        
         $this->define_columns($columns);
         $this->no_sorting('usermessage');
         $this->no_sorting('airesponse');
 
-        // Define the titles of columns to show in header.
+        // Define the titles of columns to show in header
         $headers = array(
             get_string('userid', 'mod_intebchat'), 
             get_string('username', 'mod_intebchat'), 
             get_string('usermessage', 'mod_intebchat'), 
-            get_string('airesponse', 'mod_intebchat'), 
-            get_string('time')
+            get_string('airesponse', 'mod_intebchat')
         );
+        if ($this->showTokens) {
+            $headers[] = get_string('tokens', 'mod_intebchat');
+        }
+        $headers[] = get_string('time');
+        
         $this->define_headers($headers);
     }
 
@@ -64,7 +79,8 @@ class report extends \table_sql {
     function col_usermessage($values) {
         $message = strip_tags($values->usermessage);
         if (strlen($message) > 100 && !$this->is_downloading()) {
-            return substr($message, 0, 100) . '...';
+            return '<div class="message-preview" title="' . s($message) . '">' . 
+                   substr($message, 0, 100) . '...</div>';
         }
         return $message;
     }
@@ -72,8 +88,50 @@ class report extends \table_sql {
     function col_airesponse($values) {
         $response = strip_tags($values->airesponse);
         if (strlen($response) > 100 && !$this->is_downloading()) {
-            return substr($response, 0, 100) . '...';
+            return '<div class="response-preview" title="' . s($response) . '">' . 
+                   substr($response, 0, 100) . '...</div>';
         }
         return $response;
+    }
+    
+    function col_totaltokens($values) {
+        if ($values->totaltokens > 0) {
+            $breakdown = [];
+            if ($values->prompttokens > 0) {
+                $breakdown[] = get_string('prompt', 'mod_intebchat') . ': ' . $values->prompttokens;
+            }
+            if ($values->completiontokens > 0) {
+                $breakdown[] = get_string('completion', 'mod_intebchat') . ': ' . $values->completiontokens;
+            }
+            
+            if ($this->is_downloading()) {
+                return $values->totaltokens . ' (' . implode(', ', $breakdown) . ')';
+            } else {
+                return '<span class="badge badge-info" title="' . implode(', ', $breakdown) . '">' . 
+                       $values->totaltokens . '</span>';
+            }
+        }
+        return '-';
+    }
+    
+    /**
+     * Get the total tokens used for the current query
+     * @return int Total tokens
+     */
+    public function get_total_tokens() {
+        global $DB;
+        
+        if (!$this->showTokens) {
+            return 0;
+        }
+        
+        // Use the same SQL conditions as the main query
+        $sql = "SELECT SUM(ocl.totaltokens) as total
+                FROM {mod_intebchat_log} ocl 
+                JOIN {user} u ON u.id = ocl.userid
+                WHERE " . $this->sql->where;
+        
+        $result = $DB->get_record_sql($sql, $this->sql->params);
+        return $result ? (int)$result->total : 0;
     }
 }

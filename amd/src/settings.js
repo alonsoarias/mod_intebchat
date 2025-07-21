@@ -18,17 +18,101 @@
  *
  * @module     mod_intebchat/settings
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
- * @copyright  Based on work by 2022 Bryce Yoder <me@bryceyoder.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery'], function($) {
+define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notification) {
     var init = function() {
+        // Handle global settings API type change
         $('#id_s_mod_intebchat_type').on('change', function(e) {
             // If the API Type is changed, programmatically hit save so the page automatically reloads with the new options
             $('.settingsform').addClass('mod_intebchat');
             $('.settingsform').addClass('disabled');
             $('.settingsform button[type="submit"]').click();
+        });
+
+        // Handle instance form API key change for assistant list update
+        var $apikeyField = $('#id_apikey');
+        var $assistantSelect = $('#id_assistant');
+        var $apitypeSelect = $('#id_apitype');
+        
+        if ($apikeyField.length && $assistantSelect.length) {
+            var updateAssistantList = function() {
+                var apikey = $apikeyField.val();
+                var apitype = $apitypeSelect.val() || $apitypeSelect.find('input[type="hidden"]').val();
+                
+                if (apikey && apitype === 'assistant') {
+                    // Show loading indicator
+                    $assistantSelect.prop('disabled', true);
+                    
+                    Ajax.call([{
+                        methodname: 'mod_intebchat_get_assistants',
+                        args: {apikey: apikey},
+                        done: function(response) {
+                            // Clear current options
+                            $assistantSelect.empty();
+                            
+                            if (response.assistants && response.assistants.length > 0) {
+                                $.each(response.assistants, function(index, assistant) {
+                                    $assistantSelect.append(
+                                        $('<option></option>')
+                                            .attr('value', assistant.id)
+                                            .text(assistant.name)
+                                    );
+                                });
+                            } else {
+                                $assistantSelect.append(
+                                    $('<option></option>')
+                                        .attr('value', '')
+                                        .text('No assistants found')
+                                );
+                            }
+                            
+                            $assistantSelect.prop('disabled', false);
+                        },
+                        fail: function(error) {
+                            Notification.addNotification({
+                                message: 'Failed to fetch assistants: ' + error.message,
+                                type: 'error'
+                            });
+                            $assistantSelect.prop('disabled', false);
+                        }
+                    }]);
+                }
+            };
+            
+            // Update assistants when API key changes
+            $apikeyField.on('blur', updateAssistantList);
+            
+            // Update visibility when API type changes
+            $apitypeSelect.on('change', function() {
+                if ($(this).val() === 'assistant') {
+                    updateAssistantList();
+                }
+            });
+        }
+
+        // Handle form validation for API-specific fields
+        $('form.mform').on('submit', function(e) {
+            var apitype = $('#id_apitype').val() || $('#id_apitype').find('input[type="hidden"]').val();
+            var hasErrors = false;
+            
+            // Validate Azure fields if Azure is selected
+            if (apitype === 'azure') {
+                if (!$('#id_resourcename').val()) {
+                    $('#id_error_resourcename').text('Required').show();
+                    hasErrors = true;
+                }
+                if (!$('#id_deploymentid').val()) {
+                    $('#id_error_deploymentid').text('Required').show();
+                    hasErrors = true;
+                }
+            }
+            
+            if (hasErrors) {
+                e.preventDefault();
+                return false;
+            }
         });
     };
 

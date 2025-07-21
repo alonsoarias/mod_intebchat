@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Styles for INTEB Chat module
+ * Modern styles for INTEB Chat module
  *
  * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
@@ -22,123 +22,112 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+/* Main container */
 .mod_intebchat {
     position: relative;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
 }
 
+/* Chat log container */
 .mod_intebchat #intebchat_log {
     display: flex;
     flex-direction: column;
-    max-height: 30rem;
-    min-height: 20rem;
-    overflow-y: scroll;
-    margin-bottom: 0.5rem;
-    padding: 1rem;
-    background-color: #f8f9fa;
-    border: 1px solid #dee2e6;
-    border-radius: 0.5rem;
+    min-height: 400px;
+    max-height: 600px;
+    overflow-y: auto;
+    padding: 1.5rem;
+    background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
+    border: 1px solid #e9ecef;
+    border-radius: 12px 12px 0 0;
+    scroll-behavior: smooth;
 }
 
-.mod_intebchat #intebchat_log p {
-    margin: 0;
+/* Custom scrollbar */
+.mod_intebchat #intebchat_log::-webkit-scrollbar {
+    width: 8px;
 }
 
-.mod_intebchat #intebchat_log a {
-    color: white;
-    text-decoration: underline;
+.mod_intebchat #intebchat_log::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
 }
 
-.mod_intebchat #control_bar {
-    display: flex;
-    gap: 0.5rem;
+.mod_intebchat #intebchat_log::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
 }
 
-.mod_intebchat #control_bar button:hover {
-    filter: brightness(0.8);
+.mod_intebchat #intebchat_log::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
 }
 
-.mod_intebchat #control_bar #go {
-    border-radius: 0 0.5rem 0.5rem 0;
-}
-
-.mod_intebchat #control_bar button {
-    transition: filter 0.2s ease;
-    border: none;
-    border-radius: 0.5rem;
-    width: 2.5rem;
-}
-
-.openai_input_submit_btn {
-    background-color: var(--primary, #0f6cbf);
-    color: var(--white, #fff);
-}
-
-.openai_input_refresh_btn {
-    background-color: var(--secondary, #6c757d);
-    color: white;
-}
-
-.openai_input_bar {
-    display: flex;
-    width: 100%;
-}
-
-.mod_intebchat #openai_input,
-.openai_input_bar textarea {
-    padding: 0.5rem;
-    border-radius: 0.5rem 0 0 0.5rem;
-    border: 1px solid gray;
-    width: 100%;
-    transition: background 0.4s ease;
-    resize: vertical;
-    min-height: 2.5rem;
-}
-
-.mod_intebchat #openai_input.error {
-    border: 1px solid red;
-    background-color: #fee;
-}
-
+/* Messages */
 .mod_intebchat .openai_message {
-    padding: 0.75rem 1rem;
-    background: #f4f4f4;
-    border-radius: 0.5rem;
-    margin-bottom: 1.75rem;
+    padding: 1rem 1.25rem;
+    border-radius: 18px;
+    margin-bottom: 1.5rem;
     width: fit-content;
-    max-width: 80%;
-    animation: mod_intebchat_popup 0.4s cubic-bezier(0.87, 0, 0.13, 1);
+    max-width: 75%;
+    animation: messageSlideIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     position: relative;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
+.mod_intebchat .openai_message:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Message labels */
 .mod_intebchat .openai_message:before {
     position: absolute;
-    top: -1.5rem;
-    left: 0;
-    color: gray;
-    opacity: 0;
-    animation: mod_intebchat_fade-in 0.4s ease 0.4s forwards;
-    font-size: 0.875rem;
+    top: -20px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    opacity: 0.7;
+    transition: opacity 0.2s ease;
 }
 
+.mod_intebchat .openai_message:hover:before {
+    opacity: 1;
+}
+
+/* User messages */
 .mod_intebchat .openai_message.user {
     align-self: flex-end;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: #ffffff;
     text-align: right;
-    background: var(--primary, #0f6cbf);
-    color: var(--white, #fff);
+    margin-left: auto;
 }
 
 .mod_intebchat .openai_message.user:before {
     right: 0;
     left: unset;
+    color: #667eea;
 }
 
+/* Bot messages */
 .mod_intebchat .openai_message.bot {
-    background: #e9ecef;
-    color: #212529;
+    background: #ffffff;
+    color: #2d3748;
+    border: 1px solid #e2e8f0;
 }
 
+.mod_intebchat .openai_message.bot:before {
+    color: #718096;
+}
+
+/* Loading animation */
 .mod_intebchat .openai_message.loading {
-    animation: mod_intebchat_thinking 1s ease infinite;
+    background: #e2e8f0;
+    animation: pulse 1.5s ease-in-out infinite;
 }
 
 .mod_intebchat .openai_message.loading:before {
@@ -146,80 +135,245 @@
     opacity: 0;
 }
 
+.mod_intebchat .openai_message.loading:after {
+    content: '';
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    background: #718096;
+    border-radius: 50%;
+    margin-left: 4px;
+    animation: dots 1.5s infinite;
+}
+
+/* Control bar */
+.mod_intebchat #control_bar {
+    display: flex;
+    gap: 0.75rem;
+    padding: 1rem 1.5rem;
+    background: #f7fafc;
+    border-top: 1px solid #e2e8f0;
+    align-items: flex-end;
+}
+
+/* Input bar */
+.mod_intebchat .openai_input_bar {
+    display: flex;
+    flex: 1;
+    background: #ffffff;
+    border-radius: 24px;
+    border: 2px solid #e2e8f0;
+    overflow: hidden;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.mod_intebchat .openai_input_bar:focus-within {
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* Textarea */
+.mod_intebchat #openai_input {
+    flex: 1;
+    padding: 0.75rem 1.25rem;
+    border: none;
+    background: transparent;
+    font-size: 1rem;
+    line-height: 1.5;
+    resize: none;
+    outline: none;
+    font-family: inherit;
+}
+
+.mod_intebchat #openai_input:disabled {
+    background: #f7fafc;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.mod_intebchat #openai_input.error {
+    background-color: #fff5f5;
+}
+
+/* Buttons */
+.mod_intebchat button {
+    border: none;
+    padding: 0.75rem 1.25rem;
+    border-radius: 24px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.mod_intebchat .openai_input_submit_btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 0 22px 22px 0;
+    padding: 0.75rem 1.5rem;
+}
+
+.mod_intebchat .openai_input_submit_btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+}
+
+.mod_intebchat .openai_input_submit_btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.mod_intebchat .openai_input_refresh_btn {
+    background: #e2e8f0;
+    color: #4a5568;
+}
+
+.mod_intebchat .openai_input_refresh_btn:hover {
+    background: #cbd5e0;
+    transform: rotate(180deg);
+}
+
+/* Token usage info */
+.mod_intebchat .token-usage-info {
+    padding: 1rem 1.5rem;
+    background: #f7fafc;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.mod_intebchat .token-usage-info .progress {
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.mod_intebchat .token-usage-info .progress-bar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    height: 100%;
+    transition: width 0.3s ease;
+    font-size: 0.75rem;
+    line-height: 8px;
+    color: transparent;
+    overflow: hidden;
+}
+
+/* Logging info */
+.mod_intebchat .logging-info {
+    font-size: 0.875rem;
+    color: #718096;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background: #edf2f7;
+    border-radius: 8px;
+}
+
+/* Disabled state */
 .mod_intebchat.disabled,
 .mod_intebchat .disabled {
-    opacity: 0.25;
+    opacity: 0.5;
     pointer-events: none;
 }
 
+/* Report container */
 .mod_intebchat .report_container {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 1rem;
-    margin-bottom: 1rem;
+    margin-bottom: 1.5rem;
 }
 
 .mod_intebchat .report_container > div {
-    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.mod_intebchat .report_container label {
+    font-weight: 600;
+    color: #4a5568;
+    font-size: 0.875rem;
 }
 
 .mod_intebchat .report_container input,
 .mod_intebchat .report_container select {
-    width: 100%;
-    padding: 0.375rem 0.75rem;
-    border: 1px solid #ced4da;
-    border-radius: 0.25rem;
+    padding: 0.75rem;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.2s ease;
 }
 
-@media screen and (max-width: 768px) {
-    .mod_intebchat .report_container {
-        flex-direction: column;
-    }
-    
-    .mod_intebchat .openai_message {
-        max-width: 90%;
-    }
+.mod_intebchat .report_container input:focus,
+.mod_intebchat .report_container select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
-@keyframes mod_intebchat_popup {
-    0% {
+/* Animations */
+@keyframes messageSlideIn {
+    from {
         opacity: 0;
-        transform: translateY(5px);
+        transform: translateY(20px);
     }
-
-    70% {
+    to {
         opacity: 1;
-        transform: translateY(-2.5px);
-    }
-
-    85% {
-        transform: translateY(2.5px);
-    }
-
-    100% {
         transform: translateY(0);
     }
 }
 
-@keyframes mod_intebchat_thinking {
-    0% {
+@keyframes pulse {
+    0%, 100% {
         opacity: 1;
     }
-
     50% {
-        opacity: 0.25;
-    }
-
-    100% {
-        opacity: 1;
+        opacity: 0.6;
     }
 }
 
-@keyframes mod_intebchat_fade-in {
-    from {
-        opacity: 0;
+@keyframes dots {
+    0%, 20% {
+        color: transparent;
+        text-shadow: .25em 0 0 transparent, .5em 0 0 transparent;
     }
+    40% {
+        color: #718096;
+        text-shadow: .25em 0 0 transparent, .5em 0 0 transparent;
+    }
+    60% {
+        text-shadow: .25em 0 0 #718096, .5em 0 0 transparent;
+    }
+    80%, 100% {
+        text-shadow: .25em 0 0 #718096, .5em 0 0 #718096;
+    }
+}
 
-    to {
-        opacity: 1;
+/* Responsive design */
+@media (max-width: 768px) {
+    .mod_intebchat #intebchat_log {
+        min-height: 300px;
+        max-height: 400px;
+    }
+    
+    .mod_intebchat .openai_message {
+        max-width: 85%;
+    }
+    
+    .mod_intebchat .report_container {
+        grid-template-columns: 1fr;
+    }
+    
+    .mod_intebchat #control_bar {
+        flex-wrap: wrap;
+    }
+    
+    .mod_intebchat .logging-info {
+        width: 100%;
+        margin-bottom: 0.5rem;
     }
 }

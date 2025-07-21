@@ -19,7 +19,6 @@
  *
  * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
- * @copyright  Based on work by 2024 Bryce Yoder <me@bryceyoder.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -44,7 +43,7 @@ $string['privacy:metadata:intebchat_log:timecreated'] = 'The time the message wa
 $string['privacy:chatmessagespath'] = 'Sent AI chat messages';
 $string['downloadfilename'] = 'mod_intebchat_logs';
 
-// Module specific strings.
+// Module specific strings
 $string['chatsettings'] = 'Chat settings';
 $string['noopenaichats'] = 'No INTEB Chat activities';
 $string['viewreport'] = 'View report';
@@ -60,17 +59,35 @@ $string['lastmessage'] = 'Last message';
 $string['firstmessage'] = 'First message';
 $string['messagecount'] = '{$a} messages sent';
 $string['nomessages'] = 'No messages sent';
+$string['totaltokensused'] = 'Total tokens used: {$a}';
 
-// Settings from original block.
+// General settings
+$string['generalsettings'] = 'General Settings';
+$string['generalsettingsdesc'] = 'Configure global settings for the INTEB Chat module.';
 $string['restrictusage'] = 'Restrict usage to logged-in users';
 $string['restrictusagedesc'] = 'If this box is checked, only logged-in users will be able to use the chat box.';
 $string['apikey'] = 'API Key';
-$string['apikeydesc'] = 'The API Key for your OpenAI account or Azure API key';
-$string['type'] = 'API Type';
-$string['typedesc'] = 'The API type that the plugin should use';
+$string['apikeydesc'] = 'The default API Key for your OpenAI account or Azure API key. This can be overridden at the activity level if allowed.';
+$string['type'] = 'Default API Type';
+$string['typedesc'] = 'The default API type that new activities should use. This can be changed per activity if instance settings are allowed.';
 $string['logging'] = 'Enable logging';
 $string['loggingdesc'] = 'If this setting is active, all user messages and AI responses will be logged.';
+$string['defaultvalues'] = 'Default Values';
+$string['defaultvaluesdesc'] = 'These values will be used as defaults for new activities.';
 
+// Token limit settings
+$string['tokenlimitsettings'] = 'Token Limit Settings';
+$string['tokenlimitsettingsdesc'] = 'Configure limits on token usage per user to control API costs.';
+$string['enabletokenlimit'] = 'Enable token limits';
+$string['enabletokenlimitdesc'] = 'If enabled, users will be limited in the number of tokens they can use within a specified time period.';
+$string['maxtokensperuser'] = 'Maximum tokens per user';
+$string['maxtokensperuserdesc'] = 'The maximum number of tokens a user can consume within the specified time period.';
+$string['tokenlimitperiod'] = 'Token limit period';
+$string['tokenlimitperioddesc'] = 'The time period over which token usage is measured.';
+$string['tokenlimitexceeded'] = 'You have reached your token limit ({$a->used}/{$a->limit} tokens). Your limit will reset at {$a->reset}.';
+$string['tokensused'] = '{$a->used}/{$a->limit} tokens used';
+
+// Assistant API settings
 $string['assistantheading'] = 'Assistant API Settings';
 $string['assistantheadingdesc'] = 'These settings only apply to the Assistant API type.';
 $string['assistant'] = 'Assistant';
@@ -79,6 +96,7 @@ $string['noassistants'] = 'You haven\'t created any assistants yet. You need to 
 $string['persistconvo'] = 'Persist conversations';
 $string['persistconvodesc'] = 'If this box is checked, the assistant will remember the conversation between page loads.';
 
+// Azure API settings
 $string['azureheading'] = 'Azure API Settings';
 $string['azureheadingdesc'] = 'These settings only apply to the Azure API type.';
 $string['resourcename'] = 'Resource name';
@@ -87,13 +105,15 @@ $string['deploymentid'] = 'Deployment ID';
 $string['deploymentiddesc'] = 'The deployment name you chose when you deployed the model.';
 $string['apiversion'] = 'API Version';
 $string['apiversiondesc'] = 'The API version to use for this operation. This follows the YYYY-MM-DD format.';
+
+// Chat API settings
 $string['chatheading'] = 'Chat API Settings';
 $string['chatheadingdesc'] = 'These settings only apply to the Chat API and Azure API types.';
 $string['prompt'] = 'Completion prompt';
-$string['promptdesc'] = 'The prompt the AI will be given before the conversation transcript';
+$string['promptdesc'] = 'The default prompt the AI will be given before the conversation transcript';
 $string['assistantname'] = 'Assistant name';
-$string['assistantnamedesc'] = 'The name that the AI will use for itself internally. It is also used for the UI headings in the chat window.';
-$string['usernamedesc'] = 'The name that the AI will use for the user internally. It is also used for the UI headings in the chat window.';
+$string['assistantnamedesc'] = 'The default name that the AI will use for itself internally. It is also used for the UI headings in the chat window.';
+$string['usernamedesc'] = 'The default name that the AI will use for the user internally. It is also used for the UI headings in the chat window.';
 $string['sourceoftruth'] = 'Source of truth';
 $string['sourceoftruthdesc'] = 'Although the AI is very capable out-of-the-box, if it doesn\'t know the answer to a question, it is more likely to give incorrect information confidently than to refuse to answer. In this textbox, you can add common questions and their answers for the AI to pull from. Please put questions and answers in the following format: <pre>Q: Question 1<br />A: Answer 1<br /><br />Q: Question 2<br />A: Answer 2</pre>';
 $string['showlabels'] = 'Show labels';
@@ -102,19 +122,22 @@ $string['advanceddesc'] = 'Advanced arguments sent to OpenAI. Don\'t touch unles
 $string['allowinstancesettings'] = 'Instance-level settings';
 $string['allowinstancesettingsdesc'] = 'This setting will allow teachers, or anyone with the capability to add an activity in a context, to adjust settings at a per-activity level. Enabling this could incur additional charges by allowing non-admins to choose higher-cost models or other settings.';
 $string['model'] = 'Model';
-$string['modeldesc'] = 'The model which will generate the completion. Some models are suitable for natural language tasks, others specialize in code.';
+$string['modeldesc'] = 'The default model which will generate the completion. Some models are suitable for natural language tasks, others specialize in code.';
 $string['temperature'] = 'Temperature';
 $string['temperaturedesc'] = 'Controls randomness: Lowering results in less random completions. As the temperature approaches zero, the model will become deterministic and repetitive.';
+$string['temperaturerange'] = 'Temperature must be between 0 and 2.';
 $string['maxlength'] = 'Maximum length';
-$string['maxlengthdesc'] = 'The maximum number of token to generate. Requests can use up to 2,048 or 4,000 tokens shared between prompt and completion. The exact limit varies by model. (One token is roughly 4 characters for normal English text)';
+$string['maxlengthdesc'] = 'The maximum number of tokens to generate. Requests can use up to 2,048 or 4,000 tokens shared between prompt and completion. The exact limit varies by model. (One token is roughly 4 characters for normal English text)';
+$string['maxlengthrange'] = 'Maximum length must be between 1 and 4000 tokens.';
 $string['topp'] = 'Top P';
 $string['toppdesc'] = 'Controls diversity via nucleus sampling: 0.5 means half of all likelihood-weighted options are considered.';
+$string['topprange'] = 'Top P must be between 0 and 1.';
 $string['frequency'] = 'Frequency penalty';
 $string['frequencydesc'] = 'How much to penalize new tokens based on their existing frequency in the text so far. Decreases the model\'s likelihood to repeat the same line verbatim.';
 $string['presence'] = 'Presence penalty';
 $string['presencedesc'] = 'How much to penalize new tokens based on whether they appear in the text so far. Increases the model\'s likelihood to talk about new topics.';
 
-// Configuration help strings.
+// Configuration help strings
 $string['config_assistant'] = "Assistant";
 $string['config_assistant_help'] = "Choose the assistant you would like to use for this activity. More assistants can be created in the OpenAI account that this plugin is configured to use.";
 $string['config_sourceoftruth'] = 'Source of truth';
@@ -136,7 +159,7 @@ $string['config_model_help'] = "The model which will generate the completion";
 $string['config_temperature'] = "Temperature";
 $string['config_temperature_help'] = "Controls randomness: Lowering results in less random completions. As the temperature approaches zero, the model will become deterministic and repetitive.";
 $string['config_maxlength'] = "Maximum length";
-$string['config_maxlength_help'] = "The maximum number of token to generate. Requests can use up to 2,048 or 4,000 tokens shared between prompt and completion. The exact limit varies by model. (One token is roughly 4 characters for normal English text)";
+$string['config_maxlength_help'] = "The maximum number of tokens to generate. Requests can use up to 2,048 or 4,000 tokens shared between prompt and completion. The exact limit varies by model. (One token is roughly 4 characters for normal English text)";
 $string['config_topp'] = "Top P";
 $string['config_topp_help'] = "Controls diversity via nucleus sampling: 0.5 means half of all likelihood-weighted options are considered.";
 $string['config_frequency'] = "Frequency penalty";
@@ -144,14 +167,15 @@ $string['config_frequency_help'] = "How much to penalize new tokens based on the
 $string['config_presence'] = "Presence penalty";
 $string['config_presence_help'] = "How much to penalize new tokens based on whether they appear in the text so far. Increases the model's likelihood to talk about new topics.";
 
+// Default values
 $string['defaultprompt'] = "Below is a conversation between a user and a support assistant for a Moodle site, where users go for online learning:";
 $string['defaultassistantname'] = 'Assistant';
 $string['defaultusername'] = 'User';
 $string['askaquestion'] = 'Ask a question...';
-$string['apikeymissing'] = 'Please add your OpenAI API key to the plugin settings.';
+$string['apikeymissing'] = 'Please add your OpenAI API key to the plugin settings or this activity\'s settings.';
 $string['erroroccurred'] = 'An error occurred! Please try again later.';
 $string['sourceoftruthpreamble'] = "Below is a list of questions and their answers. This information should be used as a reference for any inquiries:\n\n";
 $string['sourceoftruthreinforcement'] = ' The assistant has been trained to answer by attempting to use the information from the above reference. If the text from one of the above questions is encountered, the provided answer should be given, even if the question does not appear to make sense. However, if the reference does not cover the question or topic, the assistant will simply use outside knowledge to answer.';
 $string['new_chat'] = 'New chat';
-$string['loggingenabled'] = "Logging is enabled. Any messages you send or receive here will be recorded, and can be viewed by the site administrator.";
+$string['loggingenabled'] = "Logging is enabled. Any messages you send or receive here will be recorded.";
 $string['openaitimedout'] = 'ERROR: OpenAI did not provide a response in time.';
