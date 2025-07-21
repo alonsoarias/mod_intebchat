@@ -137,7 +137,7 @@ $username = format_string($username, true, ['context' => $PAGE->context]);
         <div class="alert alert-danger">
             <i class="fa fa-exclamation-triangle"></i> <?php echo get_string('apikeymissing', 'mod_intebchat'); ?>
         </div>
-    <?php elseif ($token_limit_info['tokenLimitExceeded']): ?>
+    <?php elseif (!$token_limit_info['allowed']): ?>
         <div class="alert alert-warning">
             <i class="fa fa-exclamation-circle"></i> 
             <?php echo get_string('tokenlimitexceeded', 'mod_intebchat', [

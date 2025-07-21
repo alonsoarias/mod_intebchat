@@ -399,9 +399,9 @@ function intebchat_get_api_config($instance) {
         'frequency' => $config->frequency,
         'presence' => $config->presence,
         'assistant' => $config->assistant,
-        'resourcename' => $config->resourcename,
-        'deploymentid' => $config->deploymentid,
-        'apiversion' => $config->apiversion,
+        'resourcename' => $config->resourcename ?? '',
+        'deploymentid' => $config->deploymentid ?? '',
+        'apiversion' => $config->apiversion ?? '',
     ];
     
     // Override with instance settings if allowed and present
