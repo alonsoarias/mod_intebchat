@@ -1,0 +1,50 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template mod_openai_chat/report_page
+
+    This template renders the report page form
+
+    Example context (json):
+    {
+        "id": int, the ID of the course module
+        "link": string, the URL for the form action
+        "user": string, the value of the user field
+        "starttime": string, the value of the starttime field
+        "endtime": string, the value of the endtime field
+    }
+}}
+
+<form class='mod_openai_chat' method='GET' action='{{link}}'>
+    <input type='hidden' name='id' value='{{id}}' />
+    <div class='report_container'>
+        <div style='display: flex; flex-direction: column'>
+            <label for='user'>{{#str}}searchbyusername, mod_openai_chat{{/str}}</label>
+            <input name='user' type='text' value='{{user}}' placeholder='{{#str}}username, mod_openai_chat{{/str}}'/>
+        </div>
+        <div style='display: flex; flex-direction: column'>
+            <label for='starttime'>{{#str}}starttime, mod_openai_chat{{/str}}</label>
+            <input type='datetime-local' name='starttime' value='{{starttime}}' />
+        </div>
+        <div style='display: flex; flex-direction: column'>
+            <label for='endtime'>{{#str}}endtime, mod_openai_chat{{/str}}</label>
+            <input type='datetime-local' name='endtime' value='{{endtime}}' />
+        </div>
+    </div>
+    <button class='btn btn-primary' type='submit'>{{#str}}search{{/str}}</button>
+</form>
+<br />

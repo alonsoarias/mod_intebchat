@@ -1,0 +1,225 @@
+/* This file is part of Moodle - http://moodle.org/
+//
+// Moodle is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// Moodle is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+//
+// You should have received a copy of the GNU General Public License
+// along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+ * Styles for OpenAI Chat module
+ *
+ * @package    mod_openai_chat
+ * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
+ * @copyright  Based on work by 2022 Bryce Yoder <me@bryceyoder.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+
+.mod_openai_chat {
+    position: relative;
+}
+
+.mod_openai_chat #openai_chat_log {
+    display: flex;
+    flex-direction: column;
+    max-height: 30rem;
+    min-height: 20rem;
+    overflow-y: scroll;
+    margin-bottom: 0.5rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+}
+
+.mod_openai_chat #openai_chat_log p {
+    margin: 0;
+}
+
+.mod_openai_chat #openai_chat_log a {
+    color: white;
+    text-decoration: underline;
+}
+
+.mod_openai_chat #control_bar {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.mod_openai_chat #control_bar button:hover {
+    filter: brightness(0.8);
+}
+
+.mod_openai_chat #control_bar #go {
+    border-radius: 0 0.5rem 0.5rem 0;
+}
+
+.mod_openai_chat #control_bar button {
+    transition: filter 0.2s ease;
+    border: none;
+    border-radius: 0.5rem;
+    width: 2.5rem;
+}
+
+.openai_input_submit_btn {
+    background-color: var(--primary, #0f6cbf);
+    color: var(--white, #fff);
+}
+
+.openai_input_refresh_btn {
+    background-color: var(--secondary, #6c757d);
+    color: white;
+}
+
+.openai_input_bar {
+    display: flex;
+    width: 100%;
+}
+
+.mod_openai_chat #openai_input,
+.openai_input_bar textarea {
+    padding: 0.5rem;
+    border-radius: 0.5rem 0 0 0.5rem;
+    border: 1px solid gray;
+    width: 100%;
+    transition: background 0.4s ease;
+    resize: vertical;
+    min-height: 2.5rem;
+}
+
+.mod_openai_chat #openai_input.error {
+    border: 1px solid red;
+    background-color: #fee;
+}
+
+.mod_openai_chat .openai_message {
+    padding: 0.75rem 1rem;
+    background: #f4f4f4;
+    border-radius: 0.5rem;
+    margin-bottom: 1.75rem;
+    width: fit-content;
+    max-width: 80%;
+    animation: mod_openai_chat_popup 0.4s cubic-bezier(0.87, 0, 0.13, 1);
+    position: relative;
+}
+
+.mod_openai_chat .openai_message:before {
+    position: absolute;
+    top: -1.5rem;
+    left: 0;
+    color: gray;
+    opacity: 0;
+    animation: mod_openai_chat_fade-in 0.4s ease 0.4s forwards;
+    font-size: 0.875rem;
+}
+
+.mod_openai_chat .openai_message.user {
+    align-self: flex-end;
+    text-align: right;
+    background: var(--primary, #0f6cbf);
+    color: var(--white, #fff);
+}
+
+.mod_openai_chat .openai_message.user:before {
+    right: 0;
+    left: unset;
+}
+
+.mod_openai_chat .openai_message.bot {
+    background: #e9ecef;
+    color: #212529;
+}
+
+.mod_openai_chat .openai_message.loading {
+    animation: mod_openai_chat_thinking 1s ease infinite;
+}
+
+.mod_openai_chat .openai_message.loading:before {
+    animation: none;
+    opacity: 0;
+}
+
+.mod_openai_chat.disabled,
+.mod_openai_chat .disabled {
+    opacity: 0.25;
+    pointer-events: none;
+}
+
+.mod_openai_chat .report_container {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.mod_openai_chat .report_container > div {
+    flex: 1;
+}
+
+.mod_openai_chat .report_container input,
+.mod_openai_chat .report_container select {
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    border: 1px solid #ced4da;
+    border-radius: 0.25rem;
+}
+
+@media screen and (max-width: 768px) {
+    .mod_openai_chat .report_container {
+        flex-direction: column;
+    }
+    
+    .mod_openai_chat .openai_message {
+        max-width: 90%;
+    }
+}
+
+@keyframes mod_openai_chat_popup {
+    0% {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+
+    70% {
+        opacity: 1;
+        transform: translateY(-2.5px);
+    }
+
+    85% {
+        transform: translateY(2.5px);
+    }
+
+    100% {
+        transform: translateY(0);
+    }
+}
+
+@keyframes mod_openai_chat_thinking {
+    0% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.25;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+@keyframes mod_openai_chat_fade-in {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
