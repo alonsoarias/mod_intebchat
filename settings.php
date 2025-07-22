@@ -160,7 +160,7 @@ if ($ADMIN->fulltree) {
             get_string('assistantheadingdesc', 'mod_intebchat')
         ));
 
-        $assistant_array = fetch_assistants_array();
+        $assistant_array = intebchat_fetch_assistants_array();
         if (count($assistant_array)) {
             $settings->add(new admin_setting_configselect(
                 'mod_intebchat/assistant',
@@ -209,7 +209,7 @@ if ($ADMIN->fulltree) {
             PARAM_TEXT
         ));
 
-        $models = get_models()['models'];
+        $models = intebchat_get_models()['models'];
         $settings->add(new admin_setting_configselect(
             'mod_intebchat/model',
             get_string('model', 'mod_intebchat'),

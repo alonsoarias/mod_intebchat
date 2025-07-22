@@ -101,7 +101,7 @@ class mod_intebchat_mod_form extends moodleform_mod {
         if ($this->current && !empty($this->current->apikey) && $config->allowinstancesettings) {
             $apikey = $this->current->apikey;
         }
-        $assistants = fetch_assistants_array($apikey);
+        $assistants = intebchat_fetch_assistants_array($apikey);
         
         if (empty($assistants)) {
             $mform->addElement('static', 'noassistants', get_string('assistant', 'mod_intebchat'), 
@@ -183,7 +183,7 @@ class mod_intebchat_mod_form extends moodleform_mod {
             $mform->addHelpButton('apikey', 'config_apikey', 'mod_intebchat');
             
             // Model selection (for chat/azure)
-            $models = get_models()['models'];
+            $models = intebchat_get_models()['models'];
             $mform->addElement('select', 'model', get_string('model', 'mod_intebchat'), $models);
             $mform->setDefault('model', $config->model ?: 'gpt-4o-mini');
             $mform->setType('model', PARAM_TEXT);
@@ -254,7 +254,7 @@ class mod_intebchat_mod_form extends moodleform_mod {
         if ($data['apitype'] === 'assistant' && empty($data['assistant'])) {
             // Only error if assistants are available
             $apikey = !empty($data['apikey']) ? $data['apikey'] : $config->apikey;
-            $assistants = fetch_assistants_array($apikey);
+            $assistants = intebchat_fetch_assistants_array($apikey);
             if (!empty($assistants)) {
                 $errors['assistant'] = get_string('required');
             }

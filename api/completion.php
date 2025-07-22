@@ -156,7 +156,7 @@ try {
     }
 
     // Log the message with token info
-    log_message($instance_id, $message, $response['message'], $context, $tokeninfo);
+    intebchat_log_message($instance_id, $message, $response['message'], $context, $tokeninfo);
 
 } catch (Exception $e) {
     $response = [

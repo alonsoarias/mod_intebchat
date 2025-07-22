@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->component = 'mod_intebchat';
-$plugin->version = 2025021800; // YYYYMMDDXX format - 18 Feb 2025
+$plugin->version = 2025021802; // YYYYMMDDXX format - 18 Feb 2025
 $plugin->requires = 2022041900; // Moodle 4.0 minimum
 $plugin->maturity = MATURITY_STABLE;
 $plugin->release = 'v2.0.0';
