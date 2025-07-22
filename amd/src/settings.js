@@ -115,13 +115,50 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
             }
         });
 
-        // Alert when a reasoning model is selected.
+        // Alert when a reasoning model is selected
         var $modelSelect = $('#id_model');
         if ($modelSelect.length) {
+            // Check initial value
+            var checkReasoningModel = function(val) {
+                if (val && (val.includes('o1') || val.includes('o3'))) {
+                    return true;
+                }
+                return false;
+            };
+
+            // Function to show reasoning model alert
+            var showReasoningModelAlert = function(modelName) {
+                Notification.addNotification({
+                    message: 'Has seleccionado el modelo "' + modelName + '". Este es un modelo de razonamiento avanzado diseñado para resolver problemas complejos mediante un análisis paso a paso. Ten en cuenta que puede tener un mayor costo y tiempo de respuesta.',
+                    type: 'info'
+                });
+            };
+
+            // Check on change
             $modelSelect.on('change', function() {
                 var val = $(this).val();
-                if (val && (val.includes('gpt-4') || val.includes('gpt-4o'))) {
-                    window.alert('Este es un modelo de razonamiento');
+                if (checkReasoningModel(val)) {
+                    showReasoningModelAlert(val);
+                }
+            });
+
+            // Also check on initial load if editing
+            var initialVal = $modelSelect.val();
+            if (initialVal && checkReasoningModel(initialVal)) {
+                // Don't show alert on initial load, just be ready for changes
+            }
+        }
+
+        // Also handle for global settings model select
+        var $globalModelSelect = $('#id_s_mod_intebchat_model');
+        if ($globalModelSelect.length) {
+            $globalModelSelect.on('change', function() {
+                var val = $(this).val();
+                if (val && (val.includes('o1') || val.includes('o3'))) {
+                    Notification.addNotification({
+                        message: 'Has seleccionado el modelo "' + val + '". Este es un modelo de razonamiento avanzado diseñado para resolver problemas complejos mediante un análisis paso a paso. Ten en cuenta que puede tener un mayor costo y tiempo de respuesta.',
+                        type: 'info'
+                    });
                 }
             });
         }

@@ -649,34 +649,107 @@ function fetch_assistants_array($apikey = null) {
 }
 
 /**
- * Return a list of available models
+ * Return a list of available models, and the type of each model.
  * @return Array: The list of model info
  */
 function intebchat_get_models() {
     return [
         "models" => [
-            'gpt-4o' => 'gpt-4o',
-            'gpt-4o-2024-11-20' => 'gpt-4o-2024-11-20',
-            'gpt-4o-2024-08-06' => 'gpt-4o-2024-08-06',
-            'gpt-4o-2024-05-13' => 'gpt-4o-2024-05-13',
-            'gpt-4o-mini-2024-07-18' => 'gpt-4o-mini-2024-07-18',
-            'gpt-4o-mini' => 'gpt-4o-mini',
-            'gpt-4-turbo-preview' => 'gpt-4-turbo-preview',
-            'gpt-4-turbo-2024-04-09' => 'gpt-4-turbo-2024-04-09',
-            'gpt-4-turbo' => 'gpt-4-turbo',
-            'gpt-4-32k-0314' => 'gpt-4-32k-0314',
-            'gpt-4-1106-preview' => 'gpt-4-1106-preview',
-            'gpt-4-0613' => 'gpt-4-0613',
-            'gpt-4-0314' => 'gpt-4-0314',
-            'gpt-4-0125-preview' => 'gpt-4-0125-preview',
-            'gpt-4' => 'gpt-4',
-            'gpt-3.5-turbo-16k-0613' => 'gpt-3.5-turbo-16k-0613',
-            'gpt-3.5-turbo-16k' => 'gpt-3.5-turbo-16k',
-            'gpt-3.5-turbo-1106' => 'gpt-3.5-turbo-1106',
-            'gpt-3.5-turbo-0125' => 'gpt-3.5-turbo-0125',
-            'gpt-3.5-turbo-0613' => 'gpt-3.5-turbo-0613',
-            'gpt-3.5-turbo-0301' => 'gpt-3.5-turbo-0301',
-            'gpt-3.5-turbo' => 'gpt-3.5-turbo'
+            // GPT-4.1 family (latest flagship models)
+            'gpt-4.1'                     => 'gpt-4.1',
+            'gpt-4.1-mini'                => 'gpt-4.1-mini',
+            'gpt-4.1-nano'                => 'gpt-4.1-nano',
+            // GPT-4.5 (preview models)
+            'gpt-4.5-preview-2025-02-27'  => 'gpt-4.5-preview-2025-02-27',
+            'gpt-4.5-preview'             => 'gpt-4.5-preview',
+            // GPT-4o (Omni) family and versions
+            'gpt-4o'                      => 'gpt-4o',
+            'gpt-4o-2024-11-20'           => 'gpt-4o-2024-11-20',
+            'gpt-4o-2024-08-06'           => 'gpt-4o-2024-08-06',
+            'gpt-4o-2024-05-13'           => 'gpt-4o-2024-05-13',
+            'gpt-4o-mini-2024-07-18'      => 'gpt-4o-mini-2024-07-18',
+            'gpt-4o-mini'                 => 'gpt-4o-mini',
+            // GPT-4o Realtime/Audio (Preview) models
+            'gpt-4o-realtime-preview-2024-12-17' => 'gpt-4o-realtime-preview-2024-12-17',
+            'gpt-4o-realtime-preview'     => 'gpt-4o-realtime-preview',
+            'gpt-4o-audio-preview-2024-12-17'    => 'gpt-4o-audio-preview-2024-12-17',
+            'gpt-4o-audio-preview-2025-06-03'    => 'gpt-4o-audio-preview-2025-06-03',
+            'gpt-4o-audio-preview'        => 'gpt-4o-audio-preview',
+            'gpt-4o-mini-realtime-preview-2024-12-17' => 'gpt-4o-mini-realtime-preview-2024-12-17',
+            'gpt-4o-mini-realtime-preview'=> 'gpt-4o-mini-realtime-preview',
+            'gpt-4o-mini-audio-preview-2024-12-17'    => 'gpt-4o-mini-audio-preview-2024-12-17',
+            'gpt-4o-mini-audio-preview'   => 'gpt-4o-mini-audio-preview',
+            // OpenAI o-series (reasoning-focused models)
+            'o1-2024-12-17'               => 'o1-2024-12-17',
+            'o1-preview'                  => 'o1-preview',
+            'o1-mini'                     => 'o1-mini',
+            'o1'                          => 'o1',
+            'o3-mini'                     => 'o3-mini',
+            'o3'                          => 'o3',
+            // GPT-4 Turbo and versions
+            'gpt-4-turbo-preview'         => 'gpt-4-turbo-preview',
+            'gpt-4-turbo-2024-04-09'      => 'gpt-4-turbo-2024-04-09',
+            'gpt-4-turbo'                 => 'gpt-4-turbo',
+            // GPT-4 (legacy models and snapshots)
+            'gpt-4-32k-0613'              => 'gpt-4-32k-0613',
+            'gpt-4-32k-0314'              => 'gpt-4-32k-0314',
+            'gpt-4-32k'                   => 'gpt-4-32k',
+            'gpt-4-1106-preview'          => 'gpt-4-1106-preview',
+            'gpt-4-0613'                  => 'gpt-4-0613',
+            'gpt-4-0314'                  => 'gpt-4-0314',
+            'gpt-4-0125-preview'          => 'gpt-4-0125-preview',
+            'gpt-4'                       => 'gpt-4',
+            // GPT-3.5 Turbo family
+            'gpt-3.5-turbo-16k-0613'      => 'gpt-3.5-turbo-16k-0613',
+            'gpt-3.5-turbo-16k'           => 'gpt-3.5-turbo-16k',
+            'gpt-3.5-turbo-1106'          => 'gpt-3.5-turbo-1106',
+            'gpt-3.5-turbo-0125'          => 'gpt-3.5-turbo-0125',
+            'gpt-3.5-turbo'               => 'gpt-3.5-turbo'
+        ],
+        "types" => [
+            // All listed models are chat-based
+            'gpt-4.1'                     => 'chat',
+            'gpt-4.1-mini'                => 'chat',
+            'gpt-4.1-nano'                => 'chat',
+            'gpt-4.5-preview-2025-02-27'  => 'chat',
+            'gpt-4.5-preview'             => 'chat',
+            'gpt-4o'                      => 'chat',
+            'gpt-4o-2024-11-20'           => 'chat',
+            'gpt-4o-2024-08-06'           => 'chat',
+            'gpt-4o-2024-05-13'           => 'chat',
+            'gpt-4o-mini-2024-07-18'      => 'chat',
+            'gpt-4o-mini'                 => 'chat',
+            'gpt-4o-realtime-preview-2024-12-17' => 'chat',
+            'gpt-4o-realtime-preview'     => 'chat',
+            'gpt-4o-audio-preview-2024-12-17'    => 'chat',
+            'gpt-4o-audio-preview-2025-06-03'    => 'chat',
+            'gpt-4o-audio-preview'        => 'chat',
+            'gpt-4o-mini-realtime-preview-2024-12-17' => 'chat',
+            'gpt-4o-mini-realtime-preview'=> 'chat',
+            'gpt-4o-mini-audio-preview-2024-12-17'    => 'chat',
+            'gpt-4o-mini-audio-preview'   => 'chat',
+            'o1-2024-12-17'               => 'chat',
+            'o1-preview'                  => 'chat',
+            'o1-mini'                     => 'chat',
+            'o1'                          => 'chat',
+            'o3-mini'                     => 'chat',
+            'o3'                          => 'chat',
+            'gpt-4-turbo-preview'         => 'chat',
+            'gpt-4-turbo-2024-04-09'      => 'chat',
+            'gpt-4-turbo'                 => 'chat',
+            'gpt-4-32k-0613'              => 'chat',
+            'gpt-4-32k-0314'              => 'chat',
+            'gpt-4-32k'                   => 'chat',
+            'gpt-4-1106-preview'          => 'chat',
+            'gpt-4-0613'                  => 'chat',
+            'gpt-4-0314'                  => 'chat',
+            'gpt-4-0125-preview'          => 'chat',
+            'gpt-4'                       => 'chat',
+            'gpt-3.5-turbo-16k-0613'      => 'chat',
+            'gpt-3.5-turbo-16k'           => 'chat',
+            'gpt-3.5-turbo-1106'          => 'chat',
+            'gpt-3.5-turbo-0125'          => 'chat',
+            'gpt-3.5-turbo'               => 'chat'
         ]
     ];
 }

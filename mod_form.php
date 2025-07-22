@@ -83,7 +83,6 @@ class mod_intebchat_mod_form extends moodleform_mod {
         $mform->setType('apitype', PARAM_TEXT);
 
         // Common settings for all API types
-
         $mform->addElement('text', 'assistantname', get_string('assistantname', 'mod_intebchat'));
         $mform->setDefault('assistantname', $config->assistantname ?: get_string('defaultassistantname', 'mod_intebchat'));
         $mform->setType('assistantname', PARAM_TEXT);
@@ -149,18 +148,18 @@ class mod_intebchat_mod_form extends moodleform_mod {
         $mform->addElement('header', 'azuresettings', get_string('azureheading', 'mod_intebchat'));
         
         $mform->addElement('text', 'resourcename', get_string('resourcename', 'mod_intebchat'));
-        $mform->setDefault('resourcename', $config->resourcename);
+        $mform->setDefault('resourcename', $config->resourcename ?? '');
         $mform->setType('resourcename', PARAM_TEXT);
         $mform->addHelpButton('resourcename', 'resourcename', 'mod_intebchat');
 
         $mform->addElement('text', 'deploymentid', get_string('deploymentid', 'mod_intebchat'));
-        $deploymentid = property_exists($config, 'deploymentid') ? $config->deploymentid : '';
+        $deploymentid = isset($config->deploymentid) ? $config->deploymentid : '';
         $mform->setDefault('deploymentid', $deploymentid);
         $mform->setType('deploymentid', PARAM_TEXT);
         $mform->addHelpButton('deploymentid', 'deploymentid', 'mod_intebchat');
 
         $mform->addElement('text', 'apiversion', get_string('apiversion', 'mod_intebchat'));
-        $apiversion = property_exists($config, 'apiversion') ? $config->apiversion : '';
+        $apiversion = isset($config->apiversion) ? $config->apiversion : '';
         $mform->setDefault('apiversion', $apiversion ?: '2023-09-01-preview');
         $mform->setType('apiversion', PARAM_TEXT);
         $mform->addHelpButton('apiversion', 'apiversion', 'mod_intebchat');

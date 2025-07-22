@@ -106,5 +106,17 @@ function xmldb_intebchat_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2025021800, 'intebchat');
     }
 
+    if ($oldversion < 2025021801) {
+        // Remove username field if it exists
+        $table = new xmldb_table('intebchat');
+        $field = new xmldb_field('username');
+        
+        if ($dbman->field_exists($table, $field)) {
+            $dbman->drop_field($table, $field);
+        }
+
+        upgrade_mod_savepoint(true, 2025021801, 'intebchat');
+    }
+
     return true;
 }

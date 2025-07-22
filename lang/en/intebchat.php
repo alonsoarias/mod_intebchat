@@ -60,6 +60,9 @@ $string['firstmessage'] = 'First message';
 $string['messagecount'] = '{$a} messages sent';
 $string['nomessages'] = 'No messages sent';
 $string['totaltokensused'] = 'Total tokens used: {$a}';
+$string['tokens'] = 'Tokens';
+$string['prompt'] = 'Prompt';
+$string['completion'] = 'Completion';
 
 // General settings
 $string['generalsettings'] = 'General Settings';
@@ -113,7 +116,6 @@ $string['prompt'] = 'Completion prompt';
 $string['promptdesc'] = 'The default prompt the AI will be given before the conversation transcript';
 $string['assistantname'] = 'Assistant name';
 $string['assistantnamedesc'] = 'The default name that the AI will use for itself internally. It is also used for the UI headings in the chat window.';
-$string['usernamedesc'] = 'The default name that the AI will use for the user internally. It is also used for the UI headings in the chat window.';
 $string['sourceoftruth'] = 'Source of truth';
 $string['sourceoftruthdesc'] = 'Although the AI is very capable out-of-the-box, if it doesn\'t know the answer to a question, it is more likely to give incorrect information confidently than to refuse to answer. In this textbox, you can add common questions and their answers for the AI to pull from. Please put questions and answers in the following format: <pre>Q: Question 1<br />A: Answer 1<br /><br />Q: Question 2<br />A: Answer 2</pre>';
 $string['showlabels'] = 'Show labels';
@@ -146,8 +148,6 @@ $string['config_instructions'] = "Custom instructions";
 $string['config_instructions_help'] = "You can override the assistant's default instructions here.";
 $string['config_prompt'] = "Completion prompt";
 $string['config_prompt_help'] = "This is the prompt the AI will be given before the conversation transcript. You can influence the AI's personality by altering this description. By default, the prompt is \n\n\"Below is a conversation between a user and a support assistant for a Moodle site, where users go for online learning.\"\n\nIf blank, the site-wide prompt will be used.";
-$string['config_username'] = "User name";
-$string['config_username_help'] = "This is the name that the AI will use for the user. If blank, the site-wide user name will be used. It is also used for the UI headings in the chat window.";
 $string['config_assistantname'] = "Assistant name";
 $string['config_assistantname_help'] = "This is the name that the AI will use for the assistant. If blank, the site-wide assistant name will be used. It is also used for the UI headings in the chat window.";
 $string['config_persistconvo'] = 'Persist conversation';

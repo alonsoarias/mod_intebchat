@@ -81,7 +81,6 @@ $setting_names = [
     'sourceoftruth', 
     'prompt',
     'instructions',
-    'username', 
     'assistantname', 
     'apikey', 
     'model', 
