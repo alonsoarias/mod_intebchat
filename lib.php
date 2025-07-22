@@ -652,7 +652,7 @@ function fetch_assistants_array($apikey = null) {
  * Return a list of available models
  * @return Array: The list of model info
  */
-function get_models() {
+function intebchat_get_models() {
     return [
         "models" => [
             'gpt-4o' => 'gpt-4o',
@@ -674,6 +674,8 @@ function get_models() {
             'gpt-3.5-turbo-16k' => 'gpt-3.5-turbo-16k',
             'gpt-3.5-turbo-1106' => 'gpt-3.5-turbo-1106',
             'gpt-3.5-turbo-0125' => 'gpt-3.5-turbo-0125',
+            'gpt-3.5-turbo-0613' => 'gpt-3.5-turbo-0613',
+            'gpt-3.5-turbo-0301' => 'gpt-3.5-turbo-0301',
             'gpt-3.5-turbo' => 'gpt-3.5-turbo'
         ]
     ];
