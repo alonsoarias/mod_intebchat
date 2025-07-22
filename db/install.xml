@@ -16,6 +16,7 @@
         <FIELD NAME="sourceoftruth" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Source of truth for the AI"/>
         <FIELD NAME="prompt" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Custom prompt for the AI"/>
         <FIELD NAME="instructions" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Instructions for assistant API"/>
+        <FIELD NAME="username" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="User alias label"/>
         <FIELD NAME="assistantname" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Assistant name label"/>
         <FIELD NAME="apikey" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Instance level API key"/>
         <FIELD NAME="model" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Model to use"/>
