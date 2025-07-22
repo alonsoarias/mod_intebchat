@@ -83,10 +83,6 @@ class mod_intebchat_mod_form extends moodleform_mod {
         $mform->setType('apitype', PARAM_TEXT);
 
         // Common settings for all API types
-        $mform->addElement('text', 'username', get_string('username', 'mod_intebchat'));
-        $mform->setDefault('username', $config->username ?: get_string('defaultusername', 'mod_intebchat'));
-        $mform->setType('username', PARAM_TEXT);
-        $mform->addHelpButton('username', 'config_username', 'mod_intebchat');
 
         $mform->addElement('text', 'assistantname', get_string('assistantname', 'mod_intebchat'));
         $mform->setDefault('assistantname', $config->assistantname ?: get_string('defaultassistantname', 'mod_intebchat'));
@@ -158,12 +154,14 @@ class mod_intebchat_mod_form extends moodleform_mod {
         $mform->addHelpButton('resourcename', 'resourcename', 'mod_intebchat');
 
         $mform->addElement('text', 'deploymentid', get_string('deploymentid', 'mod_intebchat'));
-        $mform->setDefault('deploymentid', $config->deploymentid);
+        $deploymentid = property_exists($config, 'deploymentid') ? $config->deploymentid : '';
+        $mform->setDefault('deploymentid', $deploymentid);
         $mform->setType('deploymentid', PARAM_TEXT);
         $mform->addHelpButton('deploymentid', 'deploymentid', 'mod_intebchat');
 
         $mform->addElement('text', 'apiversion', get_string('apiversion', 'mod_intebchat'));
-        $mform->setDefault('apiversion', $config->apiversion ?: '2023-09-01-preview');
+        $apiversion = property_exists($config, 'apiversion') ? $config->apiversion : '';
+        $mform->setDefault('apiversion', $apiversion ?: '2023-09-01-preview');
         $mform->setType('apiversion', PARAM_TEXT);
         $mform->addHelpButton('apiversion', 'apiversion', 'mod_intebchat');
 
@@ -183,7 +181,7 @@ class mod_intebchat_mod_form extends moodleform_mod {
             $mform->addHelpButton('apikey', 'config_apikey', 'mod_intebchat');
             
             // Model selection (for chat/azure)
-            $models = get_models()['models'];
+            $models = intebchat_get_models()['models'];
             $mform->addElement('select', 'model', get_string('model', 'mod_intebchat'), $models);
             $mform->setDefault('model', $config->model ?: 'gpt-4o-mini');
             $mform->setType('model', PARAM_TEXT);

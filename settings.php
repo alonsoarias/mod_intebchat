@@ -209,7 +209,7 @@ if ($ADMIN->fulltree) {
             PARAM_TEXT
         ));
 
-        $models = get_models()['models'];
+        $models = intebchat_get_models()['models'];
         $settings->add(new admin_setting_configselect(
             'mod_intebchat/model',
             get_string('model', 'mod_intebchat'),

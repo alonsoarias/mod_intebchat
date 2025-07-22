@@ -42,6 +42,7 @@ if ($id) {
 }
 
 require_login($course, true, $cm);
+global $USER;
 
 $event = \mod_intebchat\event\course_module_viewed::create(array(
     'objectid' => $PAGE->cm->instance,
@@ -110,7 +111,7 @@ if (!$intebchat->showlabels) {
 
 // Get assistant and user names
 $assistantname = $intebchat->assistantname ?: ($config->assistantname ?: get_string('defaultassistantname', 'mod_intebchat'));
-$username = $intebchat->username ?: ($config->username ?: get_string('defaultusername', 'mod_intebchat'));
+$username = $USER->firstname;
 
 $assistantname = format_string($assistantname, true, ['context' => $PAGE->context]);
 $username = format_string($username, true, ['context' => $PAGE->context]);

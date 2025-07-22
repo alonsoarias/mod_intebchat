@@ -114,6 +114,17 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
                 return false;
             }
         });
+
+        // Alert when a reasoning model is selected.
+        var $modelSelect = $('#id_model');
+        if ($modelSelect.length) {
+            $modelSelect.on('change', function() {
+                var val = $(this).val();
+                if (val && (val.includes('gpt-4') || val.includes('gpt-4o'))) {
+                    window.alert('Este es un modelo de razonamiento');
+                }
+            });
+        }
     };
 
     return {
