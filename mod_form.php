@@ -88,6 +88,13 @@ class mod_intebchat_mod_form extends moodleform_mod {
         $mform->setType('assistantname', PARAM_TEXT);
         $mform->addHelpButton('assistantname', 'config_assistantname', 'mod_intebchat');
 
+        if ($config->allowinstancesettings) {
+            $mform->addElement('text', 'username', get_string('username', 'mod_intebchat'));
+            $mform->setDefault('username', $config->username ?: get_string('defaultusername', 'mod_intebchat'));
+            $mform->setType('username', PARAM_TEXT);
+            $mform->addHelpButton('username', 'config_username', 'mod_intebchat');
+        }
+
         // Assistant API specific settings
         $mform->addElement('header', 'assistantsettings', get_string('assistantheading', 'mod_intebchat'));
         

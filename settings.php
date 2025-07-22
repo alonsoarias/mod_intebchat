@@ -139,6 +139,14 @@ if ($ADMIN->fulltree) {
         PARAM_TEXT
     ));
 
+    $settings->add(new admin_setting_configtext(
+        'mod_intebchat/username',
+        get_string('username', 'mod_intebchat'),
+        get_string('usernamedesc', 'mod_intebchat'),
+        get_string('defaultusername', 'mod_intebchat'),
+        PARAM_TEXT
+    ));
+
     // API-specific default settings based on selected type
     require_once($CFG->dirroot . '/mod/intebchat/lib.php');
     $type = get_config('mod_intebchat', 'type') ?: 'chat';

@@ -111,7 +111,7 @@ if (!$intebchat->showlabels) {
 
 // Get assistant name from configuration and user's firstname
 $assistantname = $intebchat->assistantname ?: ($config->assistantname ?: get_string('defaultassistantname', 'mod_intebchat'));
-$username = $USER->firstname; // Always use the user's firstname
+$username = $intebchat->username ?: ($config->username ?: $USER->firstname);
 
 $assistantname = format_string($assistantname, true, ['context' => $PAGE->context]);
 $username = format_string($username, true, ['context' => $PAGE->context]);
