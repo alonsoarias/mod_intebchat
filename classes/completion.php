@@ -67,7 +67,8 @@ class completion {
         $this->prompt = $this->get_setting('prompt', get_string('defaultprompt', 'mod_intebchat'));
         $this->assistantname = $this->get_setting('assistantname', get_string('defaultassistantname', 'mod_intebchat'));
         
-        $this->username = $this->get_setting('username', $USER->firstname);
+        // Use the current user's firstname instead of a username setting
+        $this->username = $USER->firstname ?: get_string('defaultusername', 'mod_intebchat');
 
         $this->temperature = $this->get_setting('temperature', 0.5);
         $this->maxlength = $this->get_setting('maxlength', 500);
@@ -81,7 +82,7 @@ class completion {
         // Then override with instance settings if applicable
         if (get_config('mod_intebchat', 'allowinstancesettings') === "1") {
             foreach ($instance_settings as $name => $value) {
-                if ($value !== '' && $value !== null) {
+                if ($value && $name !== 'username') { // Skip username as we always use firstname
                     $this->$name = $value;
                 }
             }

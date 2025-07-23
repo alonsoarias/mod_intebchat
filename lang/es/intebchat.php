@@ -61,7 +61,6 @@ $string['messagecount'] = '{$a} mensajes enviados';
 $string['nomessages'] = 'No se han enviado mensajes';
 $string['totaltokensused'] = 'Total de tokens usados: {$a}';
 $string['tokens'] = 'Tokens';
-$string['lastactivity'] = 'Última actividad';
 $string['prompt'] = 'Prompt';
 $string['completion'] = 'Completado';
 

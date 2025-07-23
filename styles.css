@@ -14,7 +14,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Modern styles for INTEB Chat module
+ * Professional styles for INTEB Chat module
  *
  * @package    mod_intebchat
  * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
@@ -26,22 +26,21 @@
 .mod_intebchat {
     position: relative;
     background: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     overflow: hidden;
+    border: 1px solid #e0e0e0;
 }
 
 /* Chat log container */
 .mod_intebchat #intebchat_log {
     display: flex;
     flex-direction: column;
-    min-height: 400px;
+    min-height: 450px;
     max-height: 600px;
     overflow-y: auto;
     padding: 1.5rem;
-    background: linear-gradient(to bottom, #f8f9fa 0%, #ffffff 100%);
-    border: 1px solid #e9ecef;
-    border-radius: 12px 12px 0 0;
+    background: #fafafa;
     scroll-behavior: smooth;
 }
 
@@ -51,35 +50,34 @@
 }
 
 .mod_intebchat #intebchat_log::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: #f0f0f0;
     border-radius: 4px;
 }
 
 .mod_intebchat #intebchat_log::-webkit-scrollbar-thumb {
-    background: #c1c1c1;
+    background: #c0c0c0;
     border-radius: 4px;
 }
 
 .mod_intebchat #intebchat_log::-webkit-scrollbar-thumb:hover {
-    background: #a8a8a8;
+    background: #a0a0a0;
 }
 
 /* Messages */
 .mod_intebchat .openai_message {
     padding: 1rem 1.25rem;
-    border-radius: 18px;
-    margin-bottom: 1.5rem;
+    border-radius: 8px;
+    margin-bottom: 1rem;
     width: fit-content;
     max-width: 75%;
-    animation: messageSlideIn 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     position: relative;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: box-shadow 0.2s ease;
+    word-wrap: break-word;
+    line-height: 1.5;
 }
 
 .mod_intebchat .openai_message:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* Message labels */
@@ -88,71 +86,67 @@
     top: -20px;
     font-size: 0.75rem;
     font-weight: 600;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    opacity: 0.7;
-    transition: opacity 0.2s ease;
-}
-
-.mod_intebchat .openai_message:hover:before {
-    opacity: 1;
+    letter-spacing: 0.3px;
+    opacity: 0.6;
+    color: #666;
 }
 
 /* User messages */
 .mod_intebchat .openai_message.user {
     align-self: flex-end;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #2c5282;
     color: #ffffff;
-    text-align: right;
     margin-left: auto;
+    box-shadow: 0 2px 6px rgba(44, 82, 130, 0.2);
 }
 
 .mod_intebchat .openai_message.user:before {
     right: 0;
-    left: unset;
-    color: #667eea;
+    color: #2c5282;
 }
 
 /* Bot messages */
 .mod_intebchat .openai_message.bot {
     background: #ffffff;
     color: #2d3748;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
     border: 1px solid #e2e8f0;
 }
 
 .mod_intebchat .openai_message.bot:before {
-    color: #718096;
+    color: #666;
 }
 
 /* Loading animation */
 .mod_intebchat .openai_message.loading {
     background: #e2e8f0;
-    animation: pulse 1.5s ease-in-out infinite;
+    min-width: 80px;
 }
 
-.mod_intebchat .openai_message.loading:before {
-    animation: none;
-    opacity: 0;
-}
-
-.mod_intebchat .openai_message.loading:after {
-    content: '';
+.mod_intebchat .openai_message.loading::after {
+    content: '•••';
     display: inline-block;
-    width: 4px;
-    height: 4px;
-    background: #718096;
-    border-radius: 50%;
-    margin-left: 4px;
-    animation: dots 1.5s infinite;
+    animation: loadingDots 1.5s infinite;
+    font-size: 1.2rem;
+    color: #666;
+}
+
+/* Message timestamp */
+.mod_intebchat .message-timestamp {
+    display: block;
+    font-size: 0.7rem;
+    opacity: 0.5;
+    margin-top: 0.5rem;
+    font-weight: 400;
 }
 
 /* Control bar */
 .mod_intebchat #control_bar {
     display: flex;
     gap: 0.75rem;
-    padding: 1rem 1.5rem;
-    background: #f7fafc;
-    border-top: 1px solid #e2e8f0;
+    padding: 1.25rem;
+    background: #f7f7f7;
+    border-top: 1px solid #e0e0e0;
     align-items: flex-end;
 }
 
@@ -162,43 +156,44 @@
     flex: 1;
     background: #ffffff;
     border-radius: 24px;
-    border: 2px solid #e2e8f0;
+    border: 2px solid #d0d0d0;
     overflow: hidden;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    transition: border-color 0.2s ease;
 }
 
 .mod_intebchat .openai_input_bar:focus-within {
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #2c5282;
+    box-shadow: 0 0 0 2px rgba(44, 82, 130, 0.1);
 }
 
 /* Textarea */
 .mod_intebchat #openai_input {
     flex: 1;
-    padding: 0.75rem 1.25rem;
+    padding: 0.875rem 1.25rem;
     border: none;
     background: transparent;
-    font-size: 1rem;
+    font-size: 0.95rem;
     line-height: 1.5;
     resize: none;
     outline: none;
     font-family: inherit;
+    color: #2d3748;
+}
+
+.mod_intebchat #openai_input::placeholder {
+    color: #a0a0a0;
 }
 
 .mod_intebchat #openai_input:disabled {
-    background: #f7fafc;
+    background: #f5f5f5;
     cursor: not-allowed;
     opacity: 0.6;
-}
-
-.mod_intebchat #openai_input.error {
-    background-color: #fff5f5;
 }
 
 /* Buttons */
 .mod_intebchat button {
     border: none;
-    padding: 0.75rem 1.25rem;
+    padding: 0.75rem 1.5rem;
     border-radius: 24px;
     font-weight: 600;
     cursor: pointer;
@@ -207,18 +202,23 @@
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    font-size: 0.9rem;
 }
 
 .mod_intebchat .openai_input_submit_btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #2c5282;
     color: white;
     border-radius: 0 22px 22px 0;
-    padding: 0.75rem 1.5rem;
+    padding: 0 1.75rem;
 }
 
 .mod_intebchat .openai_input_submit_btn:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    background: #2a4e7c;
+    box-shadow: 0 2px 8px rgba(44, 82, 130, 0.3);
+}
+
+.mod_intebchat .openai_input_submit_btn:active:not(:disabled) {
+    transform: translateY(1px);
 }
 
 .mod_intebchat .openai_input_submit_btn:disabled {
@@ -227,137 +227,582 @@
 }
 
 .mod_intebchat .openai_input_refresh_btn {
-    background: #e2e8f0;
+    background: #e0e0e0;
     color: #4a5568;
+    width: 48px;
+    height: 48px;
+    padding: 0;
 }
 
 .mod_intebchat .openai_input_refresh_btn:hover {
-    background: #cbd5e0;
+    background: #d0d0d0;
+}
+
+.mod_intebchat .openai_input_refresh_btn i {
+    transition: transform 0.3s ease;
+}
+
+.mod_intebchat .openai_input_refresh_btn:hover i {
     transform: rotate(180deg);
 }
 
 /* Token usage info */
 .mod_intebchat .token-usage-info {
     padding: 1rem 1.5rem;
-    background: #f7fafc;
-    border-bottom: 1px solid #e2e8f0;
+    background: #f7f7f7;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.mod_intebchat .token-usage-info .token-display {
+    margin-bottom: 0.5rem;
+}
+
+.mod_intebchat .token-usage-info .token-label {
+    font-size: 0.875rem;
+    color: #4a5568;
+    font-weight: 500;
 }
 
 .mod_intebchat .token-usage-info .progress {
     height: 8px;
-    background: #e2e8f0;
+    background: #e0e0e0;
     border-radius: 4px;
     overflow: hidden;
 }
 
 .mod_intebchat .token-usage-info .progress-bar {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #2c5282;
     height: 100%;
     transition: width 0.3s ease;
-    font-size: 0.75rem;
-    line-height: 8px;
-    color: transparent;
-    overflow: hidden;
+    position: relative;
+}
+
+/* Progress bar color states */
+.mod_intebchat .token-usage-info .progress-bar.warning {
+    background: #d69e2e;
+}
+
+.mod_intebchat .token-usage-info .progress-bar.danger {
+    background: #e53e3e;
 }
 
 /* Logging info */
 .mod_intebchat .logging-info {
-    font-size: 0.875rem;
-    color: #718096;
+    font-size: 0.85rem;
+    color: #666;
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem 1rem;
-    background: #edf2f7;
-    border-radius: 8px;
-}
-
-/* Disabled state */
-.mod_intebchat.disabled,
-.mod_intebchat .disabled {
-    opacity: 0.5;
-    pointer-events: none;
+    padding: 0.625rem 1rem;
+    background: #f0f0f0;
+    border-radius: 6px;
 }
 
 /* Report container */
 .mod_intebchat .report_container {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     gap: 1rem;
     margin-bottom: 1.5rem;
+    background: #fafafa;
+    padding: 1.25rem;
+    border: 1px solid #ddd;
 }
 
 .mod_intebchat .report_container > div {
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.375rem;
 }
 
 .mod_intebchat .report_container label {
-    font-weight: 600;
-    color: #4a5568;
+    font-weight: 500;
+    color: #333;
     font-size: 0.875rem;
 }
 
 .mod_intebchat .report_container input,
 .mod_intebchat .report_container select {
-    padding: 0.75rem;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 1rem;
+    padding: 0.625rem 0.875rem;
+    border: 1px solid #ccc;
+    font-size: 0.9rem;
     transition: border-color 0.2s ease;
+    background: #ffffff;
 }
 
 .mod_intebchat .report_container input:focus,
 .mod_intebchat .report_container select:focus {
     outline: none;
-    border-color: #667eea;
-    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    border-color: #2c5282;
 }
 
-/* Animations */
-@keyframes messageSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* Report links */
+.mod_intebchat .user-link,
+.mod_intebchat .course-link,
+.mod_intebchat .activity-link {
+    color: #2c5282;
+    text-decoration: none;
 }
 
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.6;
-    }
+.mod_intebchat .user-link:hover,
+.mod_intebchat .course-link:hover,
+.mod_intebchat .activity-link:hover {
+    text-decoration: underline;
 }
 
-@keyframes dots {
+.mod_intebchat .user-link i,
+.mod_intebchat .course-link i,
+.mod_intebchat .activity-link i {
+    margin-right: 0.25rem;
+    opacity: 0.7;
+}
+
+/* Badges - Professional style */
+.mod_intebchat .badge {
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.mod_intebchat .badge i {
+    font-size: 0.75rem;
+}
+
+.mod_intebchat .badge-info {
+    background: #f0f4f8;
+    color: #2c5282;
+    border: 1px solid #d1dae6;
+}
+
+.mod_intebchat .badge-warning {
+    background: #fffaf0;
+    color: #975a16;
+    border: 1px solid #f0d9b5;
+}
+
+.mod_intebchat .badge-danger {
+    background: #fef2f2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+}
+
+.mod_intebchat .badge-success {
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+/* Statistics cards - Corporate style */
+.mod_intebchat .card {
+    background: #ffffff;
+    border: 1px solid #ddd;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.mod_intebchat .card-header {
+    background: #f8f8f8;
+    border-bottom: 1px solid #ddd;
+    padding: 0.875rem 1.25rem;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.mod_intebchat .card-header.bg-primary {
+    background: #2c5282;
+    color: white;
+}
+
+.mod_intebchat .card-header.bg-success {
+    background: #276749;
+    color: white;
+}
+
+.mod_intebchat .card-body {
+    padding: 1.25rem;
+}
+
+.mod_intebchat .card-title {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.75rem;
+    font-weight: 600;
+    color: #2c5282;
+}
+
+.mod_intebchat .card-text {
+    color: #666;
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+/* Stat cards specific */
+.mod_intebchat .text-center {
+    text-align: center;
+}
+
+.mod_intebchat .card .fa-3x {
+    font-size: 2.5rem;
+    opacity: 0.15;
+    margin-top: 0.5rem;
+}
+
+/* Tables - Professional appearance */
+.mod_intebchat table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.mod_intebchat table.flexible {
+    background: white;
+    border: 1px solid #ddd;
+}
+
+.mod_intebchat table.flexible th {
+    background: #f8f8f8;
+    color: #333;
+    font-weight: 600;
+    font-size: 0.85rem;
+    padding: 0.75rem 1rem;
+    border-bottom: 2px solid #ddd;
+    text-align: left;
+}
+
+.mod_intebchat table.flexible td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #eee;
+    font-size: 0.9rem;
+}
+
+.mod_intebchat table.flexible tr:hover {
+    background-color: #fafafa;
+}
+
+.mod_intebchat table.flexible tr:last-child td {
+    border-bottom: none;
+}
+
+/* Small tables in cards */
+.mod_intebchat .card table.table {
+    margin: 0;
+}
+
+.mod_intebchat .card table.table-sm td,
+.mod_intebchat .card table.table-sm th {
+    padding: 0.5rem 0.75rem;
+}
+
+.mod_intebchat .card table.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.mod_intebchat .message-preview,
+.mod_intebchat .response-preview {
+    max-width: 300px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #666;
+    font-size: 0.875rem;
+}
+
+/* Token stats container */
+.mod_intebchat.token-stats-container {
+    margin-bottom: 1.5rem;
+}
+
+.mod_intebchat.token-stats-container h4,
+.mod_intebchat.token-stats-container h5 {
+    color: #333;
+    font-weight: 500;
+    margin-bottom: 0.75rem;
+}
+
+/* Global stats container */
+.mod_intebchat.global-stats-container {
+    margin-bottom: 2rem;
+}
+
+/* Download buttons area */
+.mod_intebchat .download-buttons {
+    margin: 1rem 0;
+    padding: 1rem;
+    background: #fafafa;
+    border: 1px solid #ddd;
+}
+
+/* Filter form submit button */
+.mod_intebchat .report_container + button[type="submit"] {
+    background: #2c5282;
+    color: white;
+    border: none;
+    padding: 0.625rem 1.25rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.mod_intebchat .report_container + button[type="submit"]:hover {
+    background: #2a4e7c;
+}
+
+/* Pagination */
+.mod_intebchat .paging {
+    margin: 1rem 0;
+    padding: 0.75rem;
+    background: #fafafa;
+    border: 1px solid #ddd;
+    text-align: center;
+}
+
+.mod_intebchat .paging a,
+.mod_intebchat .paging span {
+    padding: 0.375rem 0.75rem;
+    margin: 0 0.125rem;
+    text-decoration: none;
+    color: #2c5282;
+    border: 1px solid #ddd;
+    background: white;
+}
+
+.mod_intebchat .paging a:hover {
+    background: #f8f8f8;
+}
+
+.mod_intebchat .paging .active,
+.mod_intebchat .paging .current {
+    background: #2c5282;
+    color: white;
+    border-color: #2c5282;
+}
+
+/* Error states */
+.mod_intebchat #openai_input.error {
+    background-color: #fee;
+}
+
+.mod_intebchat .openai_message.error {
+    background: #fee;
+    color: #c53030;
+    border: 1px solid #fc8181;
+}
+
+/* Disabled state */
+.mod_intebchat.disabled,
+.mod_intebchat .disabled {
+    opacity: 0.6;
+    pointer-events: none;
+}
+
+/* Animations - Simplified */
+@keyframes loadingDots {
     0%, 20% {
-        color: transparent;
-        text-shadow: .25em 0 0 transparent, .5em 0 0 transparent;
+        content: '•';
     }
     40% {
-        color: #718096;
-        text-shadow: .25em 0 0 transparent, .5em 0 0 transparent;
+        content: '• •';
     }
-    60% {
-        text-shadow: .25em 0 0 #718096, .5em 0 0 transparent;
+    60%, 100% {
+        content: '• • •';
     }
-    80%, 100% {
-        text-shadow: .25em 0 0 #718096, .5em 0 0 #718096;
-    }
+}
+
+/* Alert styles */
+.mod_intebchat .alert {
+    padding: 0.875rem 1rem;
+    border-radius: 0;
+    margin-bottom: 1rem;
+    border: 1px solid;
+    font-size: 0.9rem;
+}
+
+.mod_intebchat .alert i {
+    margin-right: 0.5rem;
+    opacity: 0.8;
+}
+
+.mod_intebchat .alert-info {
+    background: #f0f8ff;
+    color: #1e3a5f;
+    border-color: #b8d4e8;
+}
+
+.mod_intebchat .alert-warning {
+    background: #fffbf0;
+    color: #856404;
+    border-color: #f0d9b5;
+}
+
+.mod_intebchat .alert-danger {
+    background: #fef2f2;
+    color: #721c24;
+    border-color: #f5c6cb;
+}
+
+/* Button styles for reports */
+.mod_intebchat .btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border: 1px solid transparent;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    transition: all 0.2s ease;
+}
+
+.mod_intebchat .btn-primary {
+    background: #2c5282;
+    color: white;
+    border-color: #2c5282;
+}
+
+.mod_intebchat .btn-primary:hover {
+    background: #2a4e7c;
+    border-color: #2a4e7c;
+    text-decoration: none;
+    color: white;
+}
+
+.mod_intebchat .btn-info {
+    background: white;
+    color: #2c5282;
+    border-color: #2c5282;
+}
+
+.mod_intebchat .btn-info:hover {
+    background: #f0f8ff;
+    color: #2c5282;
+    text-decoration: none;
+}
+
+.mod_intebchat .btn-secondary {
+    background: #6c757d;
+    color: white;
+    border-color: #6c757d;
+}
+
+.mod_intebchat .btn-secondary:hover {
+    background: #5a6268;
+    border-color: #545b62;
+    text-decoration: none;
+    color: white;
+}
+
+/* Global stats container */
+.mod_intebchat.global-stats-container .row,
+.mod_intebchat.token-stats-container .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -0.5rem;
+}
+
+.mod_intebchat.global-stats-container .col-md-3,
+.mod_intebchat.global-stats-container .col-md-6,
+.mod_intebchat.token-stats-container .col-md-6 {
+    padding: 0.5rem;
+}
+
+.mod_intebchat.global-stats-container .col-md-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+}
+
+.mod_intebchat.global-stats-container .col-md-6,
+.mod_intebchat.token-stats-container .col-md-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+}
+
+/* Professional color scheme for stats and reports */
+.mod_intebchat .text-primary {
+    color: #2c5282 !important;
+}
+
+.mod_intebchat .text-info {
+    color: #2563eb !important;
+}
+
+.mod_intebchat .text-success {
+    color: #166534 !important;
+}
+
+.mod_intebchat .text-warning {
+    color: #975a16 !important;
+}
+
+.mod_intebchat .text-danger {
+    color: #991b1b !important;
+}
+
+.mod_intebchat .text-muted {
+    color: #6c757d !important;
+}
+
+.mod_intebchat .bg-primary {
+    background-color: #2c5282 !important;
+}
+
+.mod_intebchat .bg-success {
+    background-color: #276749 !important;
+}
+
+.mod_intebchat .bg-info {
+    background-color: #2563eb !important;
+}
+
+.mod_intebchat .bg-warning {
+    background-color: #975a16 !important;
+}
+
+.mod_intebchat .bg-danger {
+    background-color: #991b1b !important;
+}
+
+/* Summary statistics styles */
+.mod_intebchat .mt-3 {
+    margin-top: 1rem;
+}
+
+.mod_intebchat .mt-4 {
+    margin-top: 1.5rem;
+}
+
+.mod_intebchat .mb-4 {
+    margin-bottom: 1.5rem;
+}
+
+.mod_intebchat .mb-0 {
+    margin-bottom: 0;
+}
+
+/* Row and column layout for stats */
+.mod_intebchat .row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -0.5rem;
+    margin-left: -0.5rem;
+}
+
+.mod_intebchat .col-md-3,
+.mod_intebchat .col-md-6 {
+    position: relative;
+    width: 100%;
+    padding-right: 0.5rem;
+    padding-left: 0.5rem;
 }
 
 /* Responsive design */
 @media (max-width: 768px) {
     .mod_intebchat #intebchat_log {
-        min-height: 300px;
-        max-height: 400px;
+        min-height: 350px;
+        max-height: 450px;
+        padding: 1rem;
     }
     
     .mod_intebchat .openai_message {
@@ -366,14 +811,94 @@
     
     .mod_intebchat .report_container {
         grid-template-columns: 1fr;
+        padding: 1rem;
     }
     
     .mod_intebchat #control_bar {
         flex-wrap: wrap;
+        padding: 1rem;
     }
     
     .mod_intebchat .logging-info {
         width: 100%;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
+        justify-content: center;
     }
+    
+    .mod_intebchat .openai_input_refresh_btn {
+        width: 44px;
+        height: 44px;
+    }
+    
+    .mod_intebchat.global-stats-container .col-md-3,
+    .mod_intebchat.global-stats-container .col-md-6,
+    .mod_intebchat.token-stats-container .col-md-6 {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+    
+    .mod_intebchat .card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Table responsive wrapper */
+.mod_intebchat .table-responsive {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Additional professional touches */
+.mod_intebchat h4,
+.mod_intebchat h5 {
+    font-weight: 500;
+}
+
+.mod_intebchat .form-control {
+    display: block;
+    width: 100%;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.mod_intebchat .form-control:focus {
+    color: #495057;
+    background-color: #fff;
+    border-color: #2c5282;
+    outline: 0;
+}
+
+/* DateTime input styling */
+.mod_intebchat input[type="datetime-local"] {
+    font-family: inherit;
+}
+
+/* Fix for Moodle default table styles */
+.mod_intebchat .generaltable {
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.mod_intebchat .generaltable th,
+.mod_intebchat .generaltable td {
+    padding: 0.75rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
+}
+
+.mod_intebchat .generaltable thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #dee2e6;
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+.mod_intebchat .generaltable tbody + tbody {
+    border-top: 2px solid #dee2e6;
 }

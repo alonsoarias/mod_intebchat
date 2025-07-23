@@ -106,7 +106,7 @@ function xmldb_intebchat_upgrade($oldversion) {
         upgrade_mod_savepoint(true, 2025021800, 'intebchat');
     }
 
-    if ($oldversion < 2025021801) {
+    if ($oldversion < 2025021900) {
         // Remove username field if it exists
         $table = new xmldb_table('intebchat');
         $field = new xmldb_field('username');
@@ -115,19 +115,7 @@ function xmldb_intebchat_upgrade($oldversion) {
             $dbman->drop_field($table, $field);
         }
 
-        upgrade_mod_savepoint(true, 2025021801, 'intebchat');
-    }
-
-    if ($oldversion < 2025021802) {
-        // Reintroduce username field for custom aliases
-        $table = new xmldb_table('intebchat');
-        $field = new xmldb_field('username', XMLDB_TYPE_CHAR, '255', null, null, null, null, 'instructions');
-
-        if (!$dbman->field_exists($table, $field)) {
-            $dbman->add_field($table, $field);
-        }
-
-        upgrade_mod_savepoint(true, 2025021802, 'intebchat');
+        upgrade_mod_savepoint(true, 2025021900, 'intebchat');
     }
 
     return true;

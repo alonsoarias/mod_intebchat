@@ -69,6 +69,134 @@ if (!$table->is_downloading()) {
     echo $OUTPUT->header();
     echo $OUTPUT->heading(get_string('intebchat_logs', 'mod_intebchat') . ' - ' . get_string('administration'));
     
+    // Add global statistics if token limit is enabled
+    $config = get_config('mod_intebchat');
+    if (!empty($config->enabletokenlimit)) {
+        $stats = $table->get_global_stats();
+        
+        echo '<div class="mod_intebchat global-stats-container mb-4">';
+        
+        // Summary cards
+        echo '<div class="row">';
+        
+        // Total messages card
+        echo '<div class="col-md-3">';
+        echo '<div class="card text-center">';
+        echo '<div class="card-body">';
+        echo '<h2 class="card-title">' . number_format($stats->total_messages) . '</h2>';
+        echo '<p class="card-text">' . get_string('messages', 'mod_intebchat') . '</p>';
+        echo '<i class="fa fa-comments fa-3x text-muted"></i>';
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+        
+        // Total tokens card
+        echo '<div class="col-md-3">';
+        echo '<div class="card text-center">';
+        echo '<div class="card-body">';
+        echo '<h2 class="card-title">' . number_format($stats->total_tokens) . '</h2>';
+        echo '<p class="card-text">' . get_string('tokens', 'mod_intebchat') . '</p>';
+        echo '<i class="fa fa-coins fa-3x text-muted"></i>';
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+        
+        // Active users card
+        echo '<div class="col-md-3">';
+        echo '<div class="card text-center">';
+        echo '<div class="card-body">';
+        echo '<h2 class="card-title">' . number_format($stats->active_users) . '</h2>';
+        echo '<p class="card-text">' . get_string('activeusers', 'mod_intebchat') . '</p>';
+        echo '<i class="fa fa-users fa-3x text-muted"></i>';
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+        
+        // Average tokens per message
+        $avg_tokens = $stats->total_messages > 0 ? round($stats->total_tokens / $stats->total_messages, 1) : 0;
+        echo '<div class="col-md-3">';
+        echo '<div class="card text-center">';
+        echo '<div class="card-body">';
+        echo '<h2 class="card-title">' . $avg_tokens . '</h2>';
+        echo '<p class="card-text">' . get_string('avgtoken', 'mod_intebchat') . '</p>';
+        echo '<i class="fa fa-chart-line fa-3x text-muted"></i>';
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+        
+        echo '</div>';
+        
+        // Top users and courses
+        echo '<div class="row mt-4">';
+        
+        // Top users
+        if (!empty($stats->top_users)) {
+            echo '<div class="col-md-6">';
+            echo '<div class="card">';
+            echo '<div class="card-header">';
+            echo '<h5 class="mb-0"><i class="fa fa-trophy"></i> ' . get_string('topusers', 'mod_intebchat') . '</h5>';
+            echo '</div>';
+            echo '<div class="card-body">';
+            echo '<table class="table table-sm">';
+            echo '<thead><tr>';
+            echo '<th>' . get_string('username', 'mod_intebchat') . '</th>';
+            echo '<th>' . get_string('messages', 'mod_intebchat') . '</th>';
+            echo '<th>' . get_string('tokens', 'mod_intebchat') . '</th>';
+            echo '</tr></thead>';
+            echo '<tbody>';
+            
+            foreach ($stats->top_users as $topuser) {
+                echo '<tr>';
+                echo '<td><a class="user-link" href="/user/profile.php?id=' . $topuser->id . '">' . 
+                     '<i class="fa fa-user"></i> ' . $topuser->firstname . ' ' . $topuser->lastname . '</a></td>';
+                echo '<td>' . $topuser->message_count . '</td>';
+                echo '<td><span class="badge badge-info"><i class="fa fa-coins"></i> ' . $topuser->total_tokens . '</span></td>';
+                echo '</tr>';
+            }
+            
+            echo '</tbody>';
+            echo '</table>';
+            echo '</div>';
+            echo '</div>';
+            echo '</div>';
+        }
+        
+        // Top courses
+        if (!empty($stats->top_courses)) {
+            echo '<div class="col-md-6">';
+            echo '<div class="card">';
+            echo '<div class="card-header">';
+            echo '<h5 class="mb-0"><i class="fa fa-graduation-cap"></i> ' . get_string('topcourses', 'mod_intebchat') . '</h5>';
+            echo '</div>';
+            echo '<div class="card-body">';
+            echo '<table class="table table-sm">';
+            echo '<thead><tr>';
+            echo '<th>' . get_string('course') . '</th>';
+            echo '<th>' . get_string('messages', 'mod_intebchat') . '</th>';
+            echo '<th>' . get_string('tokens', 'mod_intebchat') . '</th>';
+            echo '</tr></thead>';
+            echo '<tbody>';
+            
+            foreach ($stats->top_courses as $topcourse) {
+                echo '<tr>';
+                echo '<td><a class="course-link" href="/course/view.php?id=' . $topcourse->id . '">' . 
+                     '<i class="fa fa-book"></i> ' . $topcourse->fullname . '</a></td>';
+                echo '<td>' . $topcourse->message_count . '</td>';
+                echo '<td><span class="badge badge-success"><i class="fa fa-coins"></i> ' . $topcourse->total_tokens . '</span></td>';
+                echo '</tr>';
+            }
+            
+            echo '</tbody>';
+            echo '</table>';
+            echo '</div>';
+            echo '</div>';
+            echo '</div>';
+        }
+        
+        echo '</div>';
+        echo '</div>';
+    }
+    
     // Get courses for filter.
     $courses = $DB->get_records_menu('course', null, 'fullname', 'id, fullname');
     $courses[0] = get_string('all');

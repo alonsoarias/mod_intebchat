@@ -68,7 +68,8 @@ class report extends \table_sql {
         if ($this->is_downloading()) {
             return "$user->firstname $user->lastname";
         } else {
-            return "<a href='/user/profile.php?id=$values->userid'>$user->firstname $user->lastname</a>";
+            return "<a href='/user/profile.php?id=$values->userid' class='user-link'>
+                <i class='fa fa-user-circle'></i> $user->firstname $user->lastname</a>";
         }
     }
 
@@ -107,11 +108,25 @@ class report extends \table_sql {
             if ($this->is_downloading()) {
                 return $values->totaltokens . ' (' . implode(', ', $breakdown) . ')';
             } else {
-                return '<span class="badge badge-info" title="' . implode(', ', $breakdown) . '">' . 
-                       $values->totaltokens . '</span>';
+                $percentage = 0;
+                // Get user's token limit to show visual indicator
+                $token_info = intebchat_check_token_limit($values->userid);
+                if ($token_info['limit'] > 0) {
+                    $percentage = ($token_info['used'] / $token_info['limit']) * 100;
+                }
+                
+                $class = 'badge-info';
+                if ($percentage > 90) {
+                    $class = 'badge-danger';
+                } elseif ($percentage > 75) {
+                    $class = 'badge-warning';
+                }
+                
+                return '<span class="badge ' . $class . '" title="' . implode(', ', $breakdown) . '">' . 
+                       '<i class="fa fa-coins"></i> ' . $values->totaltokens . '</span>';
             }
         }
-        return '-';
+        return '<span class="text-muted">-</span>';
     }
     
     /**
@@ -133,5 +148,26 @@ class report extends \table_sql {
         
         $result = $DB->get_record_sql($sql, $this->sql->params);
         return $result ? (int)$result->total : 0;
+    }
+    
+    /**
+     * Get user statistics for the current instance
+     * @param int $instanceid Instance ID
+     * @return array User statistics
+     */
+    public function get_user_stats($instanceid) {
+        global $DB;
+        
+        $sql = "SELECT u.id, u.firstname, u.lastname, 
+                       COUNT(ocl.id) as message_count,
+                       SUM(ocl.totaltokens) as total_tokens,
+                       MAX(ocl.timecreated) as last_activity
+                FROM {user} u
+                JOIN {mod_intebchat_log} ocl ON ocl.userid = u.id
+                WHERE ocl.instanceid = :instanceid
+                GROUP BY u.id, u.firstname, u.lastname
+                ORDER BY total_tokens DESC";
+        
+        return $DB->get_records_sql($sql, ['instanceid' => $instanceid]);
     }
 }
