@@ -71,6 +71,56 @@ $table->is_downloading(
 if (!$table->is_downloading()) {
     echo $OUTPUT->header();
     echo $OUTPUT->heading(get_string('intebchat_logs', 'mod_intebchat'));
+    
+    // Add token usage summary if enabled
+    $config = get_config('mod_intebchat');
+    if (!empty($config->enabletokenlimit)) {
+        // Get statistics for this instance
+        $stats = $table->get_user_stats($intebchat->id);
+        
+        echo '<div class="mod_intebchat token-stats-container mb-4">';
+        echo '<div class="card">';
+        echo '<div class="card-header bg-primary text-white">';
+        echo '<h4 class="mb-0"><i class="fa fa-chart-bar"></i> ' . get_string('tokens', 'mod_intebchat') . ' - ' . get_string('summary') . '</h4>';
+        echo '</div>';
+        echo '<div class="card-body">';
+        
+        // Top users by token usage
+        if (!empty($stats)) {
+            echo '<h5>' . get_string('topusers', 'mod_intebchat') . '</h5>';
+            echo '<div class="table-responsive">';
+            echo '<table class="table table-sm table-striped">';
+            echo '<thead><tr>';
+            echo '<th>' . get_string('username', 'mod_intebchat') . '</th>';
+            echo '<th>' . get_string('messagecount', 'mod_intebchat') . '</th>';
+            echo '<th>' . get_string('tokens', 'mod_intebchat') . '</th>';
+            echo '<th>' . get_string('lastactivity','mod_intebchat') . '</th>';
+            echo '</tr></thead>';
+            echo '<tbody>';
+            
+            $count = 0;
+            foreach ($stats as $userstat) {
+                if ($count >= 5) break;
+                echo '<tr>';
+                echo '<td><a href="/user/profile.php?id=' . $userstat->id . '">' . 
+                     $userstat->firstname . ' ' . $userstat->lastname . '</a></td>';
+                echo '<td>' . $userstat->message_count . '</td>';
+                echo '<td><span class="badge badge-info">' . $userstat->total_tokens . '</span></td>';
+                echo '<td>' . userdate($userstat->last_activity) . '</td>';
+                echo '</tr>';
+                $count++;
+            }
+            
+            echo '</tbody>';
+            echo '</table>';
+            echo '</div>';
+        }
+        
+        echo '</div>';
+        echo '</div>';
+        echo '</div>';
+    }
+    
     echo $OUTPUT->render_from_template('mod_intebchat/report_page', [
         "id" => $id,
         "user" => $user,
@@ -110,6 +160,17 @@ $table->set_sql(
 );
 $table->define_baseurl($pageurl);
 $table->out(10, true);
+
+// Show total tokens if not downloading
+if (!$table->is_downloading() && !empty($config->enabletokenlimit)) {
+    $totaltokens = $table->get_total_tokens();
+    if ($totaltokens > 0) {
+        echo '<div class="alert alert-info mt-3">';
+        echo '<i class="fa fa-info-circle"></i> ';
+        echo get_string('totaltokensused', 'mod_intebchat', $totaltokens);
+        echo '</div>';
+    }
+}
 
 if (!$table->is_downloading()) {
     echo $OUTPUT->footer();

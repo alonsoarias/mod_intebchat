@@ -123,7 +123,7 @@ if ($ADMIN->fulltree) {
         ]
     ));
 
-    // Default values header
+    // Default values header - Only global defaults that aren't in mod_form
     $settings->add(new admin_setting_heading(
         'mod_intebchat/defaultsheading',
         get_string('defaultvalues', 'mod_intebchat'),
@@ -136,15 +136,6 @@ if ($ADMIN->fulltree) {
         get_string('assistantname', 'mod_intebchat'),
         get_string('assistantnamedesc', 'mod_intebchat'),
         get_string('defaultassistantname', 'mod_intebchat'),
-        PARAM_TEXT
-    ));
-
-    // Default user name
-    $settings->add(new admin_setting_configtext(
-        'mod_intebchat/username',
-        get_string('username', 'mod_intebchat'),
-        get_string('usernamedesc', 'mod_intebchat'),
-        get_string('defaultusername', 'mod_intebchat'),
         PARAM_TEXT
     ));
 

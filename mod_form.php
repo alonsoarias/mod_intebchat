@@ -41,7 +41,7 @@ class mod_intebchat_mod_form extends moodleform_mod {
 
         $mform = $this->_form;
         $config = get_config('mod_intebchat');
-        $type = $config->type ?: 'chat';
+        $type = $this->current && isset($this->current->apitype) ? $this->current->apitype : ($config->type ?: 'chat');
         
         // For dynamic assistant list updates
         $PAGE->requires->js_call_amd('mod_intebchat/settings', 'init');
@@ -82,96 +82,56 @@ class mod_intebchat_mod_form extends moodleform_mod {
         }
         $mform->setType('apitype', PARAM_TEXT);
 
-        // Common settings for all API types
-        $mform->addElement('text', 'username', get_string('username', 'mod_intebchat'));
-        $mform->setDefault('username', $config->username ?: get_string('defaultusername', 'mod_intebchat'));
-        $mform->setType('username', PARAM_TEXT);
-        $mform->addHelpButton('username', 'config_username', 'mod_intebchat');
-
+        // Assistant name (common for all API types)
         $mform->addElement('text', 'assistantname', get_string('assistantname', 'mod_intebchat'));
-        $mform->setDefault('assistantname', $config->assistantname ?: get_string('defaultassistantname', 'mod_intebchat'));
+        $mform->setDefault('assistantname', '');
         $mform->setType('assistantname', PARAM_TEXT);
         $mform->addHelpButton('assistantname', 'config_assistantname', 'mod_intebchat');
 
         // Assistant API specific settings
-        $mform->addElement('header', 'assistantsettings', get_string('assistantheading', 'mod_intebchat'));
-        
-        // Get assistants using the appropriate API key
-        $apikey = $config->apikey;
-        if ($this->current && !empty($this->current->apikey) && $config->allowinstancesettings) {
-            $apikey = $this->current->apikey;
-        }
-        $assistants = intebchat_fetch_assistants_array($apikey);
-        
-        if (empty($assistants)) {
-            $mform->addElement('static', 'noassistants', get_string('assistant', 'mod_intebchat'), 
-                get_string('noassistants', 'mod_intebchat'));
+        if ($type === 'assistant') {
+            if ($config->allowinstancesettings) {
+                // Get assistants using the appropriate API key
+                $apikey = $config->apikey;
+                if ($this->current && !empty($this->current->apikey)) {
+                    $apikey = $this->current->apikey;
+                }
+                $assistants = intebchat_fetch_assistants_array($apikey);
+                
+                if (empty($assistants)) {
+                    $mform->addElement('static', 'noassistants', get_string('assistant', 'mod_intebchat'), 
+                        get_string('noassistants', 'mod_intebchat'));
+                } else {
+                    $mform->addElement('select', 'assistant', get_string('assistant', 'mod_intebchat'), $assistants);
+                    $mform->setDefault('assistant', $config->assistant ?: reset($assistants));
+                    $mform->addHelpButton('assistant', 'config_assistant', 'mod_intebchat');
+                }
+                $mform->setType('assistant', PARAM_TEXT);
+
+                $mform->addElement('advcheckbox', 'persistconvo', get_string('persistconvo', 'mod_intebchat'));
+                $mform->setDefault('persistconvo', 1);
+                $mform->addHelpButton('persistconvo', 'config_persistconvo', 'mod_intebchat');
+
+                $mform->addElement('textarea', 'instructions', get_string('config_instructions', 'mod_intebchat'), 
+                    'rows="6" cols="80"');
+                $mform->setType('instructions', PARAM_TEXT);
+                $mform->addHelpButton('instructions', 'config_instructions', 'mod_intebchat');
+            }
         } else {
-            $mform->addElement('select', 'assistant', get_string('assistant', 'mod_intebchat'), $assistants);
-            $default_assistant = $config->assistant ?: reset($assistants);
-            $mform->setDefault('assistant', $default_assistant);
-            $mform->addHelpButton('assistant', 'config_assistant', 'mod_intebchat');
+            // Chat/Azure API specific settings
+            $mform->addElement('textarea', 'sourceoftruth', get_string('sourceoftruth', 'mod_intebchat'), 
+                'rows="10" cols="80"');
+            $mform->setType('sourceoftruth', PARAM_TEXT);
+            $mform->addHelpButton('sourceoftruth', 'config_sourceoftruth', 'mod_intebchat');
+
+            if ($config->allowinstancesettings) {
+                $mform->addElement('textarea', 'prompt', get_string('prompt', 'mod_intebchat'), 
+                    'rows="6" cols="80"');
+                $mform->setDefault('prompt', '');
+                $mform->setType('prompt', PARAM_TEXT);
+                $mform->addHelpButton('prompt', 'config_prompt', 'mod_intebchat');
+            }
         }
-        $mform->setType('assistant', PARAM_TEXT);
-
-        $mform->addElement('advcheckbox', 'persistconvo', get_string('persistconvo', 'mod_intebchat'));
-        $mform->setDefault('persistconvo', $config->persistconvo);
-        $mform->addHelpButton('persistconvo', 'config_persistconvo', 'mod_intebchat');
-
-        $mform->addElement('textarea', 'instructions', get_string('config_instructions', 'mod_intebchat'), 
-            'rows="6" cols="80"');
-        $mform->setType('instructions', PARAM_TEXT);
-        $mform->addHelpButton('instructions', 'config_instructions', 'mod_intebchat');
-
-        // Hide assistant settings for non-assistant APIs
-        $mform->hideIf('assistantsettings', 'apitype', 'neq', 'assistant');
-        $mform->hideIf('assistant', 'apitype', 'neq', 'assistant');
-        $mform->hideIf('persistconvo', 'apitype', 'neq', 'assistant');
-        $mform->hideIf('instructions', 'apitype', 'neq', 'assistant');
-        $mform->hideIf('noassistants', 'apitype', 'neq', 'assistant');
-
-        // Chat/Azure API specific settings
-        $mform->addElement('header', 'chatapisettings', get_string('chatheading', 'mod_intebchat'));
-        
-        $mform->addElement('textarea', 'sourceoftruth', get_string('sourceoftruth', 'mod_intebchat'), 
-            'rows="10" cols="80"');
-        $mform->setType('sourceoftruth', PARAM_TEXT);
-        $mform->addHelpButton('sourceoftruth', 'config_sourceoftruth', 'mod_intebchat');
-
-        $mform->addElement('textarea', 'prompt', get_string('prompt', 'mod_intebchat'), 
-            'rows="6" cols="80"');
-        $mform->setDefault('prompt', $config->prompt ?: get_string('defaultprompt', 'mod_intebchat'));
-        $mform->setType('prompt', PARAM_TEXT);
-        $mform->addHelpButton('prompt', 'config_prompt', 'mod_intebchat');
-
-        // Hide chat settings for assistant API
-        $mform->hideIf('chatapisettings', 'apitype', 'eq', 'assistant');
-        $mform->hideIf('sourceoftruth', 'apitype', 'eq', 'assistant');
-        $mform->hideIf('prompt', 'apitype', 'eq', 'assistant');
-
-        // Azure specific settings
-        $mform->addElement('header', 'azuresettings', get_string('azureheading', 'mod_intebchat'));
-        
-        $mform->addElement('text', 'resourcename', get_string('resourcename', 'mod_intebchat'));
-        $mform->setDefault('resourcename', $config->resourcename);
-        $mform->setType('resourcename', PARAM_TEXT);
-        $mform->addHelpButton('resourcename', 'resourcename', 'mod_intebchat');
-
-        $mform->addElement('text', 'deploymentid', get_string('deploymentid', 'mod_intebchat'));
-        $mform->setDefault('deploymentid', $config->deploymentid);
-        $mform->setType('deploymentid', PARAM_TEXT);
-        $mform->addHelpButton('deploymentid', 'deploymentid', 'mod_intebchat');
-
-        $mform->addElement('text', 'apiversion', get_string('apiversion', 'mod_intebchat'));
-        $mform->setDefault('apiversion', $config->apiversion ?: '2023-09-01-preview');
-        $mform->setType('apiversion', PARAM_TEXT);
-        $mform->addHelpButton('apiversion', 'apiversion', 'mod_intebchat');
-
-        // Hide Azure settings for non-Azure APIs
-        $mform->hideIf('azuresettings', 'apitype', 'neq', 'azure');
-        $mform->hideIf('resourcename', 'apitype', 'neq', 'azure');
-        $mform->hideIf('deploymentid', 'apitype', 'neq', 'azure');
-        $mform->hideIf('apiversion', 'apitype', 'neq', 'azure');
 
         // Advanced settings (if allowed)
         if ($config->allowinstancesettings) {
@@ -182,48 +142,62 @@ class mod_intebchat_mod_form extends moodleform_mod {
             $mform->setType('apikey', PARAM_TEXT);
             $mform->addHelpButton('apikey', 'config_apikey', 'mod_intebchat');
             
-            // Model selection (for chat/azure)
-            $models = intebchat_get_models()['models'];
-            $mform->addElement('select', 'model', get_string('model', 'mod_intebchat'), $models);
-            $mform->setDefault('model', $config->model ?: 'gpt-4o-mini');
-            $mform->setType('model', PARAM_TEXT);
-            $mform->addHelpButton('model', 'config_model', 'mod_intebchat');
-            $mform->hideIf('model', 'apitype', 'eq', 'assistant');
+            if ($type !== 'assistant') {
+                // Model selection (for chat/azure)
+                $models = intebchat_get_models()['models'];
+                $mform->addElement('select', 'model', get_string('model', 'mod_intebchat'), $models);
+                $mform->setDefault('model', get_config('mod_intebchat', 'model'));
+                $mform->setType('model', PARAM_TEXT);
+                $mform->addHelpButton('model', 'config_model', 'mod_intebchat');
 
-            // Temperature
-            $mform->addElement('text', 'temperature', get_string('temperature', 'mod_intebchat'));
-            $mform->setDefault('temperature', $config->temperature ?: 0.5);
-            $mform->setType('temperature', PARAM_FLOAT);
-            $mform->addHelpButton('temperature', 'config_temperature', 'mod_intebchat');
-            $mform->hideIf('temperature', 'apitype', 'eq', 'assistant');
+                // Temperature
+                $mform->addElement('text', 'temperature', get_string('temperature', 'mod_intebchat'));
+                $mform->setDefault('temperature', 0.5);
+                $mform->setType('temperature', PARAM_FLOAT);
+                $mform->addHelpButton('temperature', 'config_temperature', 'mod_intebchat');
 
-            // Max length
-            $mform->addElement('text', 'maxlength', get_string('maxlength', 'mod_intebchat'));
-            $mform->setDefault('maxlength', $config->maxlength ?: 500);
-            $mform->setType('maxlength', PARAM_INT);
-            $mform->addHelpButton('maxlength', 'config_maxlength', 'mod_intebchat');
-            $mform->hideIf('maxlength', 'apitype', 'eq', 'assistant');
+                // Max length
+                $mform->addElement('text', 'maxlength', get_string('maxlength', 'mod_intebchat'));
+                $mform->setDefault('maxlength', 500);
+                $mform->setType('maxlength', PARAM_INT);
+                $mform->addHelpButton('maxlength', 'config_maxlength', 'mod_intebchat');
 
-            // Top P
-            $mform->addElement('text', 'topp', get_string('topp', 'mod_intebchat'));
-            $mform->setDefault('topp', $config->topp ?: 1);
-            $mform->setType('topp', PARAM_FLOAT);
-            $mform->addHelpButton('topp', 'config_topp', 'mod_intebchat');
-            $mform->hideIf('topp', 'apitype', 'eq', 'assistant');
+                // Top P
+                $mform->addElement('text', 'topp', get_string('topp', 'mod_intebchat'));
+                $mform->setDefault('topp', 1);
+                $mform->setType('topp', PARAM_FLOAT);
+                $mform->addHelpButton('topp', 'config_topp', 'mod_intebchat');
 
-            // Frequency penalty
-            $mform->addElement('text', 'frequency', get_string('frequency', 'mod_intebchat'));
-            $mform->setDefault('frequency', $config->frequency ?: 1);
-            $mform->setType('frequency', PARAM_FLOAT);
-            $mform->addHelpButton('frequency', 'config_frequency', 'mod_intebchat');
-            $mform->hideIf('frequency', 'apitype', 'eq', 'assistant');
+                // Frequency penalty
+                $mform->addElement('text', 'frequency', get_string('frequency', 'mod_intebchat'));
+                $mform->setDefault('frequency', 1);
+                $mform->setType('frequency', PARAM_FLOAT);
+                $mform->addHelpButton('frequency', 'config_frequency', 'mod_intebchat');
 
-            // Presence penalty
-            $mform->addElement('text', 'presence', get_string('presence', 'mod_intebchat'));
-            $mform->setDefault('presence', $config->presence ?: 1);
-            $mform->setType('presence', PARAM_FLOAT);
-            $mform->addHelpButton('presence', 'config_presence', 'mod_intebchat');
-            $mform->hideIf('presence', 'apitype', 'eq', 'assistant');
+                // Presence penalty
+                $mform->addElement('text', 'presence', get_string('presence', 'mod_intebchat'));
+                $mform->setDefault('presence', 1);
+                $mform->setType('presence', PARAM_FLOAT);
+                $mform->addHelpButton('presence', 'config_presence', 'mod_intebchat');
+            }
+        }
+
+        // Azure specific settings
+        if ($type === 'azure' && $config->allowinstancesettings) {
+            $mform->addElement('text', 'resourcename', get_string('resourcename', 'mod_intebchat'));
+            $mform->setDefault('resourcename', '');
+            $mform->setType('resourcename', PARAM_TEXT);
+            $mform->addHelpButton('resourcename', 'resourcename', 'mod_intebchat');
+
+            $mform->addElement('text', 'deploymentid', get_string('deploymentid', 'mod_intebchat'));
+            $mform->setDefault('deploymentid', '');
+            $mform->setType('deploymentid', PARAM_TEXT);
+            $mform->addHelpButton('deploymentid', 'deploymentid', 'mod_intebchat');
+
+            $mform->addElement('text', 'apiversion', get_string('apiversion', 'mod_intebchat'));
+            $mform->setDefault('apiversion', '2023-09-01-preview');
+            $mform->setType('apiversion', PARAM_TEXT);
+            $mform->addHelpButton('apiversion', 'apiversion', 'mod_intebchat');
         }
 
         // Add standard elements
@@ -251,7 +225,7 @@ class mod_intebchat_mod_form extends moodleform_mod {
         }
         
         // Validate API-specific required fields
-        if ($data['apitype'] === 'assistant' && empty($data['assistant'])) {
+        if ($data['apitype'] === 'assistant' && empty($data['assistant']) && $config->allowinstancesettings) {
             // Only error if assistants are available
             $apikey = !empty($data['apikey']) ? $data['apikey'] : $config->apikey;
             $assistants = intebchat_fetch_assistants_array($apikey);
@@ -260,11 +234,11 @@ class mod_intebchat_mod_form extends moodleform_mod {
             }
         }
         
-        if ($data['apitype'] === 'azure') {
-            if (empty($data['resourcename'])) {
+        if ($data['apitype'] === 'azure' && $config->allowinstancesettings) {
+            if (empty($data['resourcename']) && empty($config->resourcename)) {
                 $errors['resourcename'] = get_string('required');
             }
-            if (empty($data['deploymentid'])) {
+            if (empty($data['deploymentid']) && empty($config->deploymentid)) {
                 $errors['deploymentid'] = get_string('required');
             }
         }

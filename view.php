@@ -82,7 +82,7 @@ $jsdata = [
 
 $PAGE->requires->js_call_amd('mod_intebchat/lib', 'init', [$jsdata]);
 
-// Add modern CSS
+// Add professional CSS
 $PAGE->requires->css('/mod/intebchat/styles.css');
 
 // Output starts here
@@ -110,7 +110,8 @@ if (!$intebchat->showlabels) {
 
 // Get assistant and user names
 $assistantname = $intebchat->assistantname ?: ($config->assistantname ?: get_string('defaultassistantname', 'mod_intebchat'));
-$username = $intebchat->username ?: ($config->username ?: get_string('defaultusername', 'mod_intebchat'));
+// Use the logged-in user's first name
+$username = $USER->firstname ?: get_string('defaultusername', 'mod_intebchat');
 
 $assistantname = format_string($assistantname, true, ['context' => $PAGE->context]);
 $username = format_string($username, true, ['context' => $PAGE->context]);
@@ -149,16 +150,22 @@ $username = format_string($username, true, ['context' => $PAGE->context]);
     <?php else: ?>
         <?php if (!empty($config->enabletokenlimit)): ?>
             <div class="token-usage-info">
+                <div class="token-display">
+                    <span class="token-label"><?php echo get_string('tokensused', 'mod_intebchat', [
+                        'used' => $token_limit_info['used'],
+                        'limit' => $token_limit_info['limit']
+                    ]); ?></span>
+                </div>
                 <div class="progress">
-                    <div class="progress-bar" role="progressbar" 
+                    <div class="progress-bar<?php 
+                        $percentage = ($token_limit_info['used'] / $token_limit_info['limit'] * 100);
+                        if ($percentage > 90) echo ' danger';
+                        elseif ($percentage > 75) echo ' warning';
+                    ?>" role="progressbar" 
                          style="width: <?php echo ($token_limit_info['used'] / $token_limit_info['limit'] * 100); ?>%"
                          aria-valuenow="<?php echo $token_limit_info['used']; ?>" 
                          aria-valuemin="0" 
                          aria-valuemax="<?php echo $token_limit_info['limit']; ?>">
-                        <?php echo get_string('tokensused', 'mod_intebchat', [
-                            'used' => $token_limit_info['used'],
-                            'limit' => $token_limit_info['limit']
-                        ]); ?>
                     </div>
                 </div>
             </div>
