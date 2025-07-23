@@ -349,7 +349,7 @@ function intebchat_update_token_usage($userid, $tokens) {
  * @param object $context The context object
  * @param array $tokeninfo Token usage information ['prompt' => int, 'completion' => int, 'total' => int]
  */
-function log_message($instanceid, $usermessage, $airesponse, $context, $tokeninfo = null) {
+function intebchat_log_message($instanceid, $usermessage, $airesponse, $context, $tokeninfo = null) {
     global $USER, $DB;
 
     if (!get_config('mod_intebchat', 'logging')) {
@@ -604,7 +604,7 @@ function intebchat_extend_settings_navigation(settings_navigation $settingsnav, 
  * Fetch the current API type from the database, defaulting to "chat"
  * @return String: the API type (chat|azure|assistant)
  */
-function get_type_to_display() {
+function intebchat_get_type_to_display() {
     $stored_type = get_config('mod_intebchat', 'type');
     if ($stored_type) {
         return $stored_type;
@@ -618,7 +618,7 @@ function get_type_to_display() {
  * @param String (optional): The API key to use. If not provided, will use site-wide key.
  * @return Array: The list of assistants
  */
-function fetch_assistants_array($apikey = null) {
+function intebchat_fetch_assistants_array($apikey = null) {
     if (!$apikey) {
         $apikey = get_config('mod_intebchat', 'apikey');
     }

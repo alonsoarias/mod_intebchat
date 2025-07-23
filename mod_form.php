@@ -103,7 +103,7 @@ class mod_intebchat_mod_form extends moodleform_mod {
         if ($this->current && !empty($this->current->apikey) && $config->allowinstancesettings) {
             $apikey = $this->current->apikey;
         }
-        $assistants = fetch_assistants_array($apikey);
+        $assistants = intebchat_fetch_assistants_array($apikey);
         
         if (empty($assistants)) {
             $mform->addElement('static', 'noassistants', get_string('assistant', 'mod_intebchat'), 
@@ -258,7 +258,7 @@ class mod_intebchat_mod_form extends moodleform_mod {
         if ($data['apitype'] === 'assistant' && empty($data['assistant'])) {
             // Only error if assistants are available
             $apikey = !empty($data['apikey']) ? $data['apikey'] : $config->apikey;
-            $assistants = fetch_assistants_array($apikey);
+            $assistants = intebchat_fetch_assistants_array($apikey);
             if (!empty($assistants)) {
                 $errors['assistant'] = get_string('required');
             }
