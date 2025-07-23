@@ -219,21 +219,7 @@ function intebchat_check_token_limit($userid) {
     
     // Calculate period start time
     $now = time();
-    switch ($period) {
-        case 'hour':
-            $periodstart = $now - 3600;
-            break;
-        case 'week':
-            $periodstart = $now - (7 * 24 * 3600);
-            break;
-        case 'month':
-            $periodstart = $now - (30 * 24 * 3600);
-            break;
-        case 'day':
-        default:
-            $periodstart = $now - (24 * 3600);
-            break;
-    }
+    $periodstart = intebchat_get_period_start($period, $now);
     
     // Get or create token usage record
     $usage = $DB->get_record('mod_intebchat_token_usage', [
@@ -310,22 +296,23 @@ function intebchat_update_token_usage($userid, $tokens) {
     
     $period = $config->tokenlimitperiod ?: 'day';
     $now = time();
-    
+
     // Calculate current period start
-    $periodstart = $now - intebchat_get_period_duration($period);
+    $periodstart = intebchat_get_period_start($period, $now);
     
     // Get or create usage record
     $usage = $DB->get_record('mod_intebchat_token_usage', [
         'userid' => $userid,
-        'periodtype' => $period
-    ], '*', IGNORE_MULTIPLE);
+        'periodtype' => $period,
+        'periodstart' => $periodstart
+    ]);
     
-    if (!$usage || $usage->periodstart < $periodstart) {
+    if (!$usage) {
         // Create new record for current period
         $usage = new stdClass();
         $usage->userid = $userid;
         $usage->tokensused = $tokens;
-        $usage->periodstart = $now;
+        $usage->periodstart = $periodstart;
         $usage->periodtype = $period;
         $usage->timecreated = $now;
         $usage->timemodified = $now;
@@ -704,4 +691,29 @@ function intebchat_view($intebchat, $course, $cm, $context) {
     // Completion.
     $completion = new completion_info($course);
     $completion->set_module_viewed($cm);
+}
+
+/**
+ * Calculate the start timestamp for the current period.
+ *
+ * @param string $period Period type
+ * @param int $timestamp Reference timestamp
+ * @return int Period start timestamp
+ */
+function intebchat_get_period_start($period, $timestamp = null) {
+    $timestamp = $timestamp ?? time();
+
+    switch ($period) {
+        case 'hour':
+            return $timestamp - ($timestamp % 3600);
+        case 'week':
+            $day = date('w', $timestamp);
+            $monday = $timestamp - (($day == 0 ? 6 : $day - 1) * 86400);
+            return strtotime(date('Y-m-d 00:00:00', $monday));
+        case 'month':
+            return strtotime(date('Y-m-01 00:00:00', $timestamp));
+        case 'day':
+        default:
+            return strtotime(date('Y-m-d 00:00:00', $timestamp));
+    }
 }
