@@ -62,7 +62,16 @@ $starttime = strtotime("-$period days");
 // Get usage data
 $usage_by_agent = intebchat_get_usage_by_agent($starttime, $endtime, $id ? $intebchat->id : 0);
 $usage_by_user = intebchat_get_usage_by_user($starttime, $endtime, $id ? $intebchat->id : 0);
-$daily_usage = intebchat_get_daily_usage($period, $id ? $intebchat->id : 0);
+    $daily_usage = intebchat_get_daily_usage($period, $id ? $intebchat->id : 0);
+
+// Recent log entries for detailed token usage
+$recent_logs = $DB->get_records_sql(
+    "SELECT userid, usermessage, airesponse, totaltokens, timecreated
+       FROM {mod_intebchat_log}
+      WHERE ( :instanceid = 0 OR instanceid = :instanceid )
+      ORDER BY timecreated DESC",
+    ['instanceid' => $id ? $intebchat->id : 0], 0, 50
+);
 
 // Summary statistics
 $total_tokens = 0;
@@ -235,6 +244,31 @@ foreach ($usage_by_agent as $agent) {
             <p class="text-muted">No usage data available for this period.</p>
             <?php endif; ?>
         </div>
+    </div>
+
+    <!-- Recent Queries -->
+    <h3>Recent Requests</h3>
+    <div class="table-responsive mb-4">
+        <table class="table table-sm">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Prompt</th>
+                    <th>Tokens</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($recent_logs as $entry): ?>
+                <tr>
+                    <td><?php echo fullname(core_user::get_user($entry->userid)); ?></td>
+                    <td><?php echo s(core_text::str_truncate($entry->usermessage, 50)); ?></td>
+                    <td><?php echo $entry->totaltokens; ?></td>
+                    <td><?php echo userdate($entry->timecreated); ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
     </div>
 </div>
 

@@ -113,6 +113,15 @@ $assistantname = $intebchat->assistantname ?: ($config->assistantname ?: get_str
 // Use the logged-in user's first name
 $username = $USER->firstname ?: get_string('defaultusername', 'mod_intebchat');
 
+// Retrieve previous chat history for this user if logging and persistence are enabled
+$historylogs = [];
+if ($config->logging && $persistconvo && isloggedin()) {
+    $historylogs = $DB->get_records('mod_intebchat_log', [
+        'instanceid' => $intebchat->id,
+        'userid' => $USER->id
+    ], 'timecreated ASC');
+}
+
 $assistantname = format_string($assistantname, true, ['context' => $PAGE->context]);
 $username = format_string($username, true, ['context' => $PAGE->context]);
 
@@ -171,7 +180,20 @@ $username = format_string($username, true, ['context' => $PAGE->context]);
             </div>
         <?php endif; ?>
 
-        <div id="intebchat_log" role="log" aria-live="polite"></div>
+        <div id="intebchat_log" role="log" aria-live="polite">
+            <?php foreach ($historylogs as $log): ?>
+                <div class="openai_message user">
+                    <span><?php echo s($log->usermessage); ?></span>
+                    <span class="message-timestamp"><?php echo userdate($log->timecreated, '%H:%M'); ?></span>
+                </div>
+                <?php if (!empty($log->airesponse)) : ?>
+                <div class="openai_message bot">
+                    <span><?php echo format_text($log->airesponse, FORMAT_HTML, ['context' => $PAGE->context]); ?></span>
+                    <span class="message-timestamp"><?php echo userdate($log->timecreated, '%H:%M'); ?></span>
+                </div>
+                <?php endif; ?>
+            <?php endforeach; ?>
+        </div>
         
         <div id="control_bar">
             <?php if ($config->logging): ?>
