@@ -79,11 +79,9 @@ function intebchat_add_instance(stdClass $intebchat, mod_intebchat_mod_form $mfo
         $intebchat->introformat = FORMAT_HTML;
     }
 
-    // Ensure apitype is set
-    if (empty($intebchat->apitype)) {
-        $config = get_config('mod_intebchat');
-        $intebchat->apitype = $config->type ?: 'chat';
-    }
+    // Always use global API type
+    $config = get_config('mod_intebchat');
+    $intebchat->apitype = $config->type ?: 'chat';
 
     // Set defaults for unchecked checkboxes
     if (!isset($intebchat->showlabels)) {
@@ -111,12 +109,10 @@ function intebchat_add_instance(stdClass $intebchat, mod_intebchat_mod_form $mfo
         $intebchat->persistconvo = 0;
     }
 
-    if ($intebchat->apitype !== 'azure') {
-        // Clear Azure-specific fields
-        $intebchat->resourcename = null;
-        $intebchat->deploymentid = null;
-        $intebchat->apiversion = null;
-    }
+    // Clear any Azure fields that might exist
+    $intebchat->resourcename = null;
+    $intebchat->deploymentid = null;
+    $intebchat->apiversion = null;
 
     // Insert the record
     $intebchat->id = $DB->insert_record('intebchat', $intebchat);
@@ -137,11 +133,9 @@ function intebchat_update_instance(stdClass $intebchat, mod_intebchat_mod_form $
     $intebchat->timemodified = time();
     $intebchat->id = $intebchat->instance;
 
-    // Ensure apitype is set
-    if (empty($intebchat->apitype)) {
-        $current = $DB->get_record('intebchat', array('id' => $intebchat->id), 'apitype');
-        $intebchat->apitype = $current->apitype ?: 'chat';
-    }
+    // Always use global API type
+    $config = get_config('mod_intebchat');
+    $intebchat->apitype = $config->type ?: 'chat';
 
     // Set defaults for unchecked checkboxes
     if (!isset($intebchat->showlabels)) {
@@ -167,11 +161,10 @@ function intebchat_update_instance(stdClass $intebchat, mod_intebchat_mod_form $
         $intebchat->persistconvo = 0;
     }
 
-    if ($intebchat->apitype !== 'azure') {
-        $intebchat->resourcename = null;
-        $intebchat->deploymentid = null;
-        $intebchat->apiversion = null;
-    }
+    // Clear any Azure fields
+    $intebchat->resourcename = null;
+    $intebchat->deploymentid = null;
+    $intebchat->apiversion = null;
 
     return $DB->update_record('intebchat', $intebchat);
 }
@@ -328,6 +321,34 @@ function intebchat_update_token_usage($userid, $tokens) {
 }
 
 /**
+ * Normalize token usage from different OpenAI API response formats
+ *
+ * @param array $usage Raw usage data from API response
+ * @return array|null Normalized token info or null if empty
+ */
+function intebchat_normalize_usage($usage) {
+    if (empty($usage) || !is_array($usage)) {
+        return null;
+    }
+    
+    // Handle both old format (prompt_tokens/completion_tokens) and new format (input_tokens/output_tokens)
+    $prompt = $usage['prompt_tokens'] ?? $usage['input_tokens'] ?? 0;
+    $completion = $usage['completion_tokens'] ?? $usage['output_tokens'] ?? 0;
+    $total = $usage['total_tokens'] ?? ($prompt + $completion);
+    
+    // Only return if we have actual token data
+    if ($total > 0) {
+        return [
+            'prompt' => (int)$prompt,
+            'completion' => (int)$completion,
+            'total' => (int)$total
+        ];
+    }
+    
+    return null;
+}
+
+/**
  * Log message with token tracking
  *
  * @param int $instanceid The module instance ID
@@ -352,7 +373,7 @@ function intebchat_log_message($instanceid, $usermessage, $airesponse, $context,
     $record->timecreated = time();
     
     // Add token information if provided
-    if ($tokeninfo) {
+    if ($tokeninfo && is_array($tokeninfo)) {
         $record->prompttokens = $tokeninfo['prompt'] ?? 0;
         $record->completiontokens = $tokeninfo['completion'] ?? 0;
         $record->totaltokens = $tokeninfo['total'] ?? 0;
@@ -361,9 +382,48 @@ function intebchat_log_message($instanceid, $usermessage, $airesponse, $context,
         if ($record->totaltokens > 0) {
             intebchat_update_token_usage($USER->id, $record->totaltokens);
         }
+    } else {
+        // Log with zero tokens if no token info provided
+        $record->prompttokens = 0;
+        $record->completiontokens = 0;
+        $record->totaltokens = 0;
     }
 
     $DB->insert_record('mod_intebchat_log', $record);
+}
+
+/**
+ * Log detailed token usage by agent/assistant
+ *
+ * @param int $instanceid The module instance ID
+ * @param string $agentid The agent/assistant ID
+ * @param int $userid The user ID
+ * @param string $model The model used
+ * @param array $tokeninfo Token usage information
+ */
+function intebchat_log_usage($instanceid, $agentid, $userid, $model, $tokeninfo = null) {
+    global $DB;
+    
+    if (empty($tokeninfo) || !is_array($tokeninfo)) {
+        return;
+    }
+    
+    $record = new stdClass();
+    $record->instanceid = $instanceid;
+    $record->agentid = $agentid ?: 'default';
+    $record->userid = $userid ?: null;
+    $record->model = $model;
+    $record->prompttokens = $tokeninfo['prompt'] ?? 0;
+    $record->completiontokens = $tokeninfo['completion'] ?? 0;
+    $record->totaltokens = $tokeninfo['total'] ?? 0;
+    $record->timecreated = time();
+    
+    try {
+        $DB->insert_record('mod_intebchat_usage', $record);
+    } catch (\Exception $e) {
+        // Table might not exist yet if upgrade hasn't run
+        debugging('Could not log usage data: ' . $e->getMessage(), DEBUG_DEVELOPER);
+    }
 }
 
 /**
@@ -378,7 +438,7 @@ function intebchat_get_api_config($instance) {
     // Start with global config
     $apiconfig = [
         'apikey' => $config->apikey,
-        'type' => $instance->apitype ?: $config->type,
+        'type' => $config->type ?: 'chat',
         'model' => $config->model,
         'temperature' => $config->temperature,
         'maxlength' => $config->maxlength,
@@ -386,9 +446,6 @@ function intebchat_get_api_config($instance) {
         'frequency' => $config->frequency,
         'presence' => $config->presence,
         'assistant' => $config->assistant,
-        'resourcename' => $config->resourcename ?? '',
-        'deploymentid' => $config->deploymentid ?? '',
-        'apiversion' => $config->apiversion ?? '',
     ];
     
     // Override with instance settings if allowed and present
@@ -416,15 +473,6 @@ function intebchat_get_api_config($instance) {
         }
         if (!empty($instance->assistant)) {
             $apiconfig['assistant'] = $instance->assistant;
-        }
-        if (!empty($instance->resourcename)) {
-            $apiconfig['resourcename'] = $instance->resourcename;
-        }
-        if (!empty($instance->deploymentid)) {
-            $apiconfig['deploymentid'] = $instance->deploymentid;
-        }
-        if (!empty($instance->apiversion)) {
-            $apiconfig['apiversion'] = $instance->apiversion;
         }
     }
     
@@ -589,11 +637,11 @@ function intebchat_extend_settings_navigation(settings_navigation $settingsnav, 
 
 /**
  * Fetch the current API type from the database, defaulting to "chat"
- * @return String: the API type (chat|azure|assistant)
+ * @return String: the API type (chat|assistant)
  */
 function intebchat_get_type_to_display() {
     $stored_type = get_config('mod_intebchat', 'type');
-    if ($stored_type) {
+    if ($stored_type && in_array($stored_type, ['chat', 'assistant'])) {
         return $stored_type;
     }
     
