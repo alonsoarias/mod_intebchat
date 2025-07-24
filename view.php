@@ -66,7 +66,7 @@ $token_limit_info = intebchat_check_token_limit($USER->id);
 
 // Prepare data for JavaScript
 $persistconvo = $intebchat->persistconvo && $config->allowinstancesettings ? $intebchat->persistconvo : $config->persistconvo;
-$api_type = $intebchat->apitype ?: $config->type;
+$api_type = $config->type ?: 'chat'; // Always use global API type
 
 // Pass data to JavaScript
 $jsdata = [
