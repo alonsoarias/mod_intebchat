@@ -31,6 +31,7 @@ defined('MOODLE_INTERNAL') || die;
 class assistant extends \mod_intebchat\completion {
 
     private $thread_id;
+    private $run_usage = null; // Store usage data from run
 
     public function __construct($model, $message, $history, $instance_settings, $thread_id) {
         parent::__construct($model, $message, $history, $instance_settings);
@@ -44,11 +45,18 @@ class assistant extends \mod_intebchat\completion {
 
     /**
      * Given everything we know after constructing the parent, create a completion by constructing the prompt and making the api call
-     * @return JSON: The API response from OpenAI
+     * @return array The API response including token usage
      */
     public function create_completion($context) {
         $this->add_message_to_thread();
-        return $this->run();
+        $result = $this->run();
+        
+        // Add usage data if available
+        if ($this->run_usage) {
+            $result['usage'] = $this->run_usage;
+        }
+        
+        return $result;
     }
 
     private function create_thread() {
@@ -92,8 +100,8 @@ class assistant extends \mod_intebchat\completion {
     }
 
     /**
-     * Make the actual API call to OpenAI
-     * @return JSON: The response from OpenAI
+     * Make the actual API call to OpenAI and get run details including token usage
+     * @return array The response from OpenAI
      */
     private function run() {
 
@@ -135,10 +143,15 @@ class assistant extends \mod_intebchat\completion {
                     "thread_id" => 0
                 ];
             }
-            $run_completed = $this->check_run_status($run_id);
+            $run_status = $this->check_run_status($run_id);
+            $run_completed = $run_status['completed'];
+            if ($run_status['usage']) {
+                $this->run_usage = $run_status['usage'];
+            }
             sleep(1);
         }
 
+        // Get the messages after run completion
         $curl = new \curl();
         $curl->setopt(array(
             'CURLOPT_HTTPHEADER' => array(
@@ -157,6 +170,11 @@ class assistant extends \mod_intebchat\completion {
         ];
     }
 
+    /**
+     * Check run status and extract usage data
+     * @param string $run_id The run ID to check
+     * @return array Status and usage information
+     */
     private function check_run_status($run_id) {
         $curl = new \curl();
         $curl->setopt(array(
@@ -168,11 +186,23 @@ class assistant extends \mod_intebchat\completion {
         ));
 
         $response = $curl->get("https://api.openai.com/v1/threads/" . $this->thread_id . "/runs/" . $run_id);
-        $response = json_decode($response);
+        $response = json_decode($response, true);
         
-        if ($response->status === 'completed' || property_exists($response, 'error')) {
-            return true;
+        $completed = false;
+        $usage = null;
+        
+        if (isset($response['status'])) {
+            $completed = ($response['status'] === 'completed' || isset($response['error']));
+            
+            // Extract usage data if available
+            if (isset($response['usage'])) {
+                $usage = $response['usage'];
+            }
         }
-        return false;
+        
+        return [
+            'completed' => $completed,
+            'usage' => $usage
+        ];
     }
 }
