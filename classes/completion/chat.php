@@ -93,6 +93,7 @@ class chat extends \mod_intebchat\completion {
             ),
         ));
 
+        // Use the standard chat completions endpoint
         $response = $curl->post("https://api.openai.com/v1/chat/completions", json_encode($curlbody));
         $response = json_decode($response);
 
@@ -107,11 +108,12 @@ class chat extends \mod_intebchat\completion {
             $result['message'] = $response->choices[0]->message->content;
             
             // Include token usage information if available
+            // This is the standard format from OpenAI API
             if (property_exists($response, 'usage')) {
                 $result['usage'] = [
-                    'prompt_tokens' => $response->usage->prompt_tokens,
-                    'completion_tokens' => $response->usage->completion_tokens,
-                    'total_tokens' => $response->usage->total_tokens
+                    'prompt_tokens' => $response->usage->prompt_tokens ?? 0,
+                    'completion_tokens' => $response->usage->completion_tokens ?? 0,
+                    'total_tokens' => $response->usage->total_tokens ?? 0
                 ];
             }
         }
