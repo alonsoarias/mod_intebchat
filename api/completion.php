@@ -89,10 +89,7 @@ $setting_names = [
     'topp', 
     'frequency', 
     'presence',
-    'assistant',
-    'resourcename',
-    'deploymentid',
-    'apiversion'
+    'assistant'
 ];
 foreach ($setting_names as $setting) {
     if (property_exists($instance, $setting)) {
@@ -104,7 +101,7 @@ foreach ($setting_names as $setting) {
 
 // Get API configuration
 $apiconfig = intebchat_get_api_config($instance);
-$api_type = $instance->apitype ?: $config->type;
+$api_type = $config->type ?: 'chat';
 $model = $apiconfig['model'];
 
 // Validate API key
@@ -142,20 +139,37 @@ try {
     // Format the markdown of each completion message into HTML.
     $response["message"] = format_text($response["message"], FORMAT_MARKDOWN, ['context' => $context]);
 
-    // Extract token information if available
+    // Normalize token usage from different API response formats
     $tokeninfo = null;
-    if (isset($response['usage'])) {
-        $tokeninfo = [
-            'prompt' => $response['usage']['prompt_tokens'] ?? 0,
-            'completion' => $response['usage']['completion_tokens'] ?? 0,
-            'total' => $response['usage']['total_tokens'] ?? 0
-        ];
-        $response['tokenInfo'] = $tokeninfo;
+    if (isset($response['usage']) && is_array($response['usage'])) {
+        $tokeninfo = intebchat_normalize_usage($response['usage']);
+        if ($tokeninfo) {
+            $response['tokenInfo'] = $tokeninfo;
+            
+            // Debug logging to help diagnose token tracking issues
+            if (debugging()) {
+                error_log('INTEBCHAT Token Usage - Instance: ' . $instance_id . 
+                         ', User: ' . $USER->id . 
+                         ', Tokens: ' . json_encode($tokeninfo));
+            }
+        }
         unset($response['usage']); // Remove internal usage data from response
     }
 
     // Log the message with token info
     intebchat_log_message($instance_id, $message, $response['message'], $context, $tokeninfo);
+    
+    // Log detailed usage by agent/assistant if token info is available
+    if ($tokeninfo && $tokeninfo['total'] > 0) {
+        $agentid = '';
+        if ($api_type === 'assistant' && !empty($instance_settings['assistant'])) {
+            $agentid = $instance_settings['assistant'];
+        } elseif (!empty($model)) {
+            $agentid = $model; // Use model as agent ID for chat API
+        }
+        
+        intebchat_log_usage($instance_id, $agentid, $USER->id, $model, $tokeninfo);
+    }
 
 } catch (Exception $e) {
     $response = [
