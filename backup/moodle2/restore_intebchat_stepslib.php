@@ -15,67 +15,89 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Define all the backup steps that will be used by the backup_intebchat_activity_task
+ * Restore steps for mod_intebchat.
  *
  * @package    mod_intebchat
  * @category   backup
- * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
+ * @copyright  2025 Alonso Arias
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die;
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/backup/moodle2/restore_stepslib.php');
 
 /**
- * Define the complete intebchat structure for backup
+ * Structure step to restore one intebchat activity.
  */
-class backup_intebchat_activity_structure_step extends backup_activity_structure_step {
+class restore_intebchat_activity_structure_step extends restore_activity_structure_step {
 
     /**
-     * Defines the backup structure of the module
+     * Define the structure to be restored.
      *
-     * @return backup_nested_element
+     * @return array of restore_path_element
      */
     protected function define_structure() {
-
-        // Get know if we are including userinfo.
+        $paths = [];
         $userinfo = $this->get_setting_value('userinfo');
 
-        // Define the root element describing the intebchat instance.
-        $intebchat = new backup_nested_element('intebchat', array('id'), array(
-            'name', 'intro', 'introformat', 'showlabels', 'apitype',
-            'sourceoftruth', 'prompt', 'instructions', 'assistantname',
-            'apikey', 'model', 'temperature', 'maxlength', 'topp', 
-            'frequency', 'presence', 'assistant', 'persistconvo',
-            'resourcename', 'deploymentid', 'apiversion',
-            'timecreated', 'timemodified'
-        ));
+        // Root element.
+        $paths[] = new restore_path_element('intebchat', '/activity/intebchat');
 
-        // Define chat logs.
-        $logs = new backup_nested_element('logs');
-        $log = new backup_nested_element('log', array('id'), array(
-            'userid', 'usermessage', 'airesponse', 'prompttokens',
-            'completiontokens', 'totaltokens', 'timecreated'
-        ));
-
-        // Build the tree.
-        $intebchat->add_child($logs);
-        $logs->add_child($log);
-
-        // Define data sources.
-        $intebchat->set_source_table('intebchat', array('id' => backup::VAR_ACTIVITYID));
-
-        // All the rest of elements only happen if we are including user info.
+        // Child elements (only if user info is included).
         if ($userinfo) {
-            $log->set_source_table('mod_intebchat_log', array('instanceid' => backup::VAR_PARENTID), 'id ASC');
+            $paths[] = new restore_path_element('intebchat_log', '/activity/intebchat/logs/log');
         }
 
-        // Define id annotations.
-        $log->annotate_ids('user', 'userid');
+        return $this->prepare_activity_structure($paths);
+    }
 
-        // Define file annotations.
-        $intebchat->annotate_files('mod_intebchat', 'intro', null);
+    /**
+     * Process main activity record.
+     *
+     * @param array $data
+     */
+    protected function process_intebchat($data) {
+        global $DB;
+        $data = (object)$data;
 
-        // Return the root element (intebchat), wrapped into standard activity structure.
-        return $this->prepare_activity_structure($intebchat);
+        // Mandatory field in every module table.
+        $data->course = $this->get_courseid();
+
+        // Make sure timestamps exist.
+        if (empty($data->timecreated)) {
+            $data->timecreated = time();
+        }
+        if (empty($data->timemodified)) {
+            $data->timemodified = time();
+        }
+
+        // Insert and apply mapping.
+        $newitemid = $DB->insert_record('intebchat', $data);
+        $this->apply_activity_instance($newitemid);
+    }
+
+    /**
+     * Process each log row.
+     *
+     * @param array $data
+     */
+    protected function process_intebchat_log($data) {
+        global $DB;
+        $data = (object)$data;
+
+        $data->instanceid = $this->get_new_parentid('intebchat');
+        $data->userid     = $this->get_mappingid('user', $data->userid);
+
+        // Ajusta el nombre de la tabla si en tu install.xml usaste otro.
+        $DB->insert_record('intebchat_log', $data);
+    }
+
+    /**
+     * After execution: add related files.
+     */
+    protected function after_execute() {
+        // Intro files.
+        $this->add_related_files('mod_intebchat', 'intro', null);
     }
 }
