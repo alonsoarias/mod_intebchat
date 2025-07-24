@@ -15,11 +15,11 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * The task that provides a complete restore of mod_intebchat is defined here.
+ * Restore task for mod_intebchat.
  *
  * @package    mod_intebchat
  * @category   backup
- * @copyright  2025 Alonso Arias <soporte@ingeweb.co>
+ * © 2025 Alonso Arias
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -28,81 +28,68 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/intebchat/backup/moodle2/restore_intebchat_stepslib.php');
 
 /**
- * Restore task that provides all the settings and steps to perform a complete restore of the activity
+ * Provides all the settings and steps to perform a complete restore of the activity.
  */
 class restore_intebchat_activity_task extends restore_activity_task {
 
     /**
-     * Define (add) particular settings this activity can have
+     * No particular settings.
      */
     protected function define_my_settings() {
-        // No particular settings for this activity.
+        // Nothing here.
     }
 
     /**
-     * Define (add) particular steps this activity can have
+     * Define steps.
      */
     protected function define_my_steps() {
-        // INTEB Chat only has one structure step.
         $this->add_step(new restore_intebchat_activity_structure_step('intebchat_structure', 'intebchat.xml'));
     }
 
     /**
-     * Define the contents in the activity that must be
-     * processed by the link decoder
+     * Define contents to be decoded.
+     *
+     * @return restore_decode_content[]
      */
-    static public function define_decode_contents() {
-        $contents = array();
-
-        $contents[] = new restore_decode_content('intebchat', array('intro'), 'intebchat');
-
+    public static function define_decode_contents() {
+        $contents = [];
+        $contents[] = new restore_decode_content('intebchat', ['intro'], 'intebchat');
         return $contents;
     }
 
     /**
-     * Define the decoding rules for links belonging
-     * to the activity to be executed by the link decoder
-     */
-    static public function define_decode_rules() {
-        $rules = array();
-
-        $rules[] = new restore_decode_rule('OPENAICHATVIEWBYID', '/mod/intebchat/view.php?id=$1', 'course_module');
-        $rules[] = new restore_decode_rule('OPENAICHATINDEX', '/mod/intebchat/index.php?id=$1', 'course');
-
-        return $rules;
-    }
-
-    /**
-     * Define the restore log rules that will be applied
-     * by the {@link restore_logs_processor} when restoring
-     * intebchat logs. It must return one array
-     * of {@link restore_log_rule} objects
-     */
-    static public function define_restore_log_rules() {
-        $rules = array();
-
-        $rules[] = new restore_log_rule('intebchat', 'add', 'view.php?id={course_module}', '{intebchat}');
-        $rules[] = new restore_log_rule('intebchat', 'update', 'view.php?id={course_module}', '{intebchat}');
-        $rules[] = new restore_log_rule('intebchat', 'view', 'view.php?id={course_module}', '{intebchat}');
-
-        return $rules;
-    }
-
-    /**
-     * Define the restore log rules that will be applied
-     * by the {@link restore_logs_processor} when restoring
-     * course logs. It must return one array
-     * of {@link restore_log_rule} objects
+     * Define link decoding rules.
      *
-     * Note this rules are applied when restoring course logs
-     * by the restore final task, but are defined here at
-     * activity level. All them are rules not linked to any module instance (cmid = 0)
+     * @return restore_decode_rule[]
      */
-    static public function define_restore_log_rules_for_course() {
-        $rules = array();
+    public static function define_decode_rules() {
+        $rules = [];
+        $rules[] = new restore_decode_rule('INTEBCHATVIEWBYID', '/mod/intebchat/view.php?id=$1', 'course_module');
+        $rules[] = new restore_decode_rule('INTEBCHATINDEX',     '/mod/intebchat/index.php?id=$1', 'course');
+        return $rules;
+    }
 
+    /**
+     * Define restore log rules for this activity.
+     *
+     * @return restore_log_rule[]
+     */
+    public static function define_restore_log_rules() {
+        $rules = [];
+        $rules[] = new restore_log_rule('intebchat', 'add',    'view.php?id={course_module}', '{intebchat}');
+        $rules[] = new restore_log_rule('intebchat', 'update', 'view.php?id={course_module}', '{intebchat}');
+        $rules[] = new restore_log_rule('intebchat', 'view',   'view.php?id={course_module}', '{intebchat}');
+        return $rules;
+    }
+
+    /**
+     * Restore log rules for course logs (cmid = 0).
+     *
+     * @return restore_log_rule[]
+     */
+    public static function define_restore_log_rules_for_course() {
+        $rules = [];
         $rules[] = new restore_log_rule('intebchat', 'view all', 'index.php?id={course}', null);
-
         return $rules;
     }
 }
