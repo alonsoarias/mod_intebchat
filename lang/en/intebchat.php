@@ -70,9 +70,9 @@ $string['generalsettingsdesc'] = 'Configure global settings for the INTEB Chat m
 $string['restrictusage'] = 'Restrict usage to logged-in users';
 $string['restrictusagedesc'] = 'If this box is checked, only logged-in users will be able to use the chat box.';
 $string['apikey'] = 'API Key';
-$string['apikeydesc'] = 'The default API Key for your OpenAI account or Azure API key. This can be overridden at the activity level if allowed.';
+$string['apikeydesc'] = 'The default API Key for your OpenAI account. This can be overridden at the activity level if allowed.';
 $string['type'] = 'Default API Type';
-$string['typedesc'] = 'The default API type that new activities should use. This can be changed per activity if instance settings are allowed.';
+$string['typedesc'] = 'The default API type that will be used globally for all activities.';
 $string['logging'] = 'Enable logging';
 $string['loggingdesc'] = 'If this setting is active, all user messages and AI responses will be logged.';
 $string['defaultvalues'] = 'Default Values';
@@ -99,19 +99,9 @@ $string['noassistants'] = 'You haven\'t created any assistants yet. You need to 
 $string['persistconvo'] = 'Persist conversations';
 $string['persistconvodesc'] = 'If this box is checked, the assistant will remember the conversation between page loads.';
 
-// Azure API settings
-$string['azureheading'] = 'Azure API Settings';
-$string['azureheadingdesc'] = 'These settings only apply to the Azure API type.';
-$string['resourcename'] = 'Resource name';
-$string['resourcenamedesc'] = 'The name of your Azure OpenAI Resource.';
-$string['deploymentid'] = 'Deployment ID';
-$string['deploymentiddesc'] = 'The deployment name you chose when you deployed the model.';
-$string['apiversion'] = 'API Version';
-$string['apiversiondesc'] = 'The API version to use for this operation. This follows the YYYY-MM-DD format.';
-
 // Chat API settings
 $string['chatheading'] = 'Chat API Settings';
-$string['chatheadingdesc'] = 'These settings only apply to the Chat API and Azure API types.';
+$string['chatheadingdesc'] = 'These settings only apply to the Chat API type.';
 $string['prompt'] = 'Completion prompt';
 $string['promptdesc'] = 'The default prompt the AI will be given before the conversation transcript';
 $string['assistantname'] = 'Assistant name';
@@ -139,7 +129,7 @@ $string['frequencydesc'] = 'How much to penalize new tokens based on their exist
 $string['presence'] = 'Presence penalty';
 $string['presencedesc'] = 'How much to penalize new tokens based on whether they appear in the text so far. Increases the model\'s likelihood to talk about new topics.';
 
-// Configuration help strings - Note: username setting has been removed
+// Configuration help strings
 $string['config_assistant'] = "Assistant";
 $string['config_assistant_help'] = "Choose the assistant you would like to use for this activity. More assistants can be created in the OpenAI account that this plugin is configured to use.";
 $string['config_sourceoftruth'] = 'Source of truth';
