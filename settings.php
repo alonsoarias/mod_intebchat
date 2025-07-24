@@ -52,13 +52,13 @@ if ($ADMIN->fulltree) {
         PARAM_TEXT
     ));
 
-    // Default API Type
+    // Default API Type (only chat and assistant now)
     $settings->add(new admin_setting_configselect(
         'mod_intebchat/type',
         get_string('type', 'mod_intebchat'),
         get_string('typedesc', 'mod_intebchat'),
         'chat',
-        ['chat' => 'Chat API', 'assistant' => 'Assistant API', 'azure' => 'Azure API']
+        ['chat' => 'Chat API', 'assistant' => 'Assistant API']
     ));
 
     // Restrict usage to logged-in users
@@ -176,8 +176,8 @@ if ($ADMIN->fulltree) {
         ));
     }
 
-    // Chat/Azure API defaults
-    if ($type === 'chat' || $type === 'azure') {
+    // Chat API defaults
+    if ($type === 'chat') {
         $settings->add(new admin_setting_heading(
             'mod_intebchat/chatdefaults',
             get_string('chatheading', 'mod_intebchat'),
@@ -247,39 +247,6 @@ if ($ADMIN->fulltree) {
             get_string('presencedesc', 'mod_intebchat'),
             1,
             PARAM_FLOAT
-        ));
-    }
-
-    // Azure-specific defaults
-    if ($type === 'azure') {
-        $settings->add(new admin_setting_heading(
-            'mod_intebchat/azuredefaults',
-            get_string('azureheading', 'mod_intebchat'),
-            get_string('azureheadingdesc', 'mod_intebchat')
-        ));
-
-        $settings->add(new admin_setting_configtext(
-            'mod_intebchat/resourcename',
-            get_string('resourcename', 'mod_intebchat'),
-            get_string('resourcenamedesc', 'mod_intebchat'),
-            '',
-            PARAM_TEXT
-        ));
-
-        $settings->add(new admin_setting_configtext(
-            'mod_intebchat/deploymentid',
-            get_string('deploymentid', 'mod_intebchat'),
-            get_string('deploymentiddesc', 'mod_intebchat'),
-            '',
-            PARAM_TEXT
-        ));
-
-        $settings->add(new admin_setting_configtext(
-            'mod_intebchat/apiversion',
-            get_string('apiversion', 'mod_intebchat'),
-            get_string('apiversiondesc', 'mod_intebchat'),
-            '2023-09-01-preview',
-            PARAM_TEXT
         ));
     }
 }
