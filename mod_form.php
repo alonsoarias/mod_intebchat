@@ -41,7 +41,7 @@ class mod_intebchat_mod_form extends moodleform_mod {
 
         $mform = $this->_form;
         $config = get_config('mod_intebchat');
-        $type = $this->current && isset($this->current->apitype) ? $this->current->apitype : ($config->type ?: 'chat');
+        $type = $config->type ?: 'chat';
         
         // For dynamic assistant list updates
         $PAGE->requires->js_call_amd('mod_intebchat/settings', 'init');
@@ -71,15 +71,8 @@ class mod_intebchat_mod_form extends moodleform_mod {
         $mform->addElement('advcheckbox', 'showlabels', get_string('showlabels', 'mod_intebchat'));
         $mform->setDefault('showlabels', 1);
 
-        // API Type selector (instance level if allowed)
-        if ($config->allowinstancesettings) {
-            $mform->addElement('select', 'apitype', get_string('type', 'mod_intebchat'), 
-                ['chat' => 'Chat API', 'assistant' => 'Assistant API', 'azure' => 'Azure API']);
-            $mform->setDefault('apitype', $type);
-            $mform->addHelpButton('apitype', 'type', 'mod_intebchat');
-        } else {
-            $mform->addElement('hidden', 'apitype', $type);
-        }
+        // Hidden field for API type (always use global setting)
+        $mform->addElement('hidden', 'apitype', $type);
         $mform->setType('apitype', PARAM_TEXT);
 
         // Assistant name (common for all API types)
@@ -118,7 +111,7 @@ class mod_intebchat_mod_form extends moodleform_mod {
                 $mform->addHelpButton('instructions', 'config_instructions', 'mod_intebchat');
             }
         } else {
-            // Chat/Azure API specific settings
+            // Chat API specific settings
             $mform->addElement('textarea', 'sourceoftruth', get_string('sourceoftruth', 'mod_intebchat'), 
                 'rows="10" cols="80"');
             $mform->setType('sourceoftruth', PARAM_TEXT);
@@ -143,7 +136,7 @@ class mod_intebchat_mod_form extends moodleform_mod {
             $mform->addHelpButton('apikey', 'config_apikey', 'mod_intebchat');
             
             if ($type !== 'assistant') {
-                // Model selection (for chat/azure)
+                // Model selection (for chat)
                 $models = intebchat_get_models()['models'];
                 $mform->addElement('select', 'model', get_string('model', 'mod_intebchat'), $models);
                 $mform->setDefault('model', get_config('mod_intebchat', 'model'));
@@ -182,24 +175,6 @@ class mod_intebchat_mod_form extends moodleform_mod {
             }
         }
 
-        // Azure specific settings
-        if ($type === 'azure' && $config->allowinstancesettings) {
-            $mform->addElement('text', 'resourcename', get_string('resourcename', 'mod_intebchat'));
-            $mform->setDefault('resourcename', '');
-            $mform->setType('resourcename', PARAM_TEXT);
-            $mform->addHelpButton('resourcename', 'resourcename', 'mod_intebchat');
-
-            $mform->addElement('text', 'deploymentid', get_string('deploymentid', 'mod_intebchat'));
-            $mform->setDefault('deploymentid', '');
-            $mform->setType('deploymentid', PARAM_TEXT);
-            $mform->addHelpButton('deploymentid', 'deploymentid', 'mod_intebchat');
-
-            $mform->addElement('text', 'apiversion', get_string('apiversion', 'mod_intebchat'));
-            $mform->setDefault('apiversion', '2023-09-01-preview');
-            $mform->setType('apiversion', PARAM_TEXT);
-            $mform->addHelpButton('apiversion', 'apiversion', 'mod_intebchat');
-        }
-
         // Add standard elements
         $this->standard_coursemodule_elements();
 
@@ -234,15 +209,6 @@ class mod_intebchat_mod_form extends moodleform_mod {
             }
         }
         
-        if ($data['apitype'] === 'azure' && $config->allowinstancesettings) {
-            if (empty($data['resourcename']) && empty($config->resourcename)) {
-                $errors['resourcename'] = get_string('required');
-            }
-            if (empty($data['deploymentid']) && empty($config->deploymentid)) {
-                $errors['deploymentid'] = get_string('required');
-            }
-        }
-        
         // Validate numeric fields
         if (!empty($data['temperature'])) {
             if ($data['temperature'] < 0 || $data['temperature'] > 2) {
@@ -273,10 +239,9 @@ class mod_intebchat_mod_form extends moodleform_mod {
     public function data_preprocessing(&$default_values) {
         parent::data_preprocessing($default_values);
         
-        // Set apitype from current data if editing
-        if ($this->current && isset($this->current->apitype)) {
-            $default_values['apitype'] = $this->current->apitype;
-        }
+        // Always use global API type
+        $config = get_config('mod_intebchat');
+        $default_values['apitype'] = $config->type ?: 'chat';
     }
 
     /**
@@ -287,10 +252,8 @@ class mod_intebchat_mod_form extends moodleform_mod {
     public function data_postprocessing($data) {
         parent::data_postprocessing($data);
         
-        // Ensure apitype is always set
-        if (empty($data->apitype)) {
-            $config = get_config('mod_intebchat');
-            $data->apitype = $config->type ?: 'chat';
-        }
+        // Ensure apitype is always set from global config
+        $config = get_config('mod_intebchat');
+        $data->apitype = $config->type ?: 'chat';
     }
 }
