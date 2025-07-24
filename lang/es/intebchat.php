@@ -70,9 +70,9 @@ $string['generalsettingsdesc'] = 'Configure los ajustes globales para el módulo
 $string['restrictusage'] = 'Restringir uso a usuarios autenticados';
 $string['restrictusagedesc'] = 'Si esta casilla está marcada, solo los usuarios autenticados podrán usar el chat.';
 $string['apikey'] = 'Clave API';
-$string['apikeydesc'] = 'La clave API predeterminada para su cuenta de OpenAI o clave API de Azure. Esto puede ser sobrescrito a nivel de actividad si se permite.';
+$string['apikeydesc'] = 'La clave API predeterminada para su cuenta de OpenAI. Esto puede ser sobrescrito a nivel de actividad si se permite.';
 $string['type'] = 'Tipo de API predeterminado';
-$string['typedesc'] = 'El tipo de API predeterminado que las nuevas actividades deben usar. Esto puede cambiarse por actividad si se permiten configuraciones de instancia.';
+$string['typedesc'] = 'El tipo de API predeterminado que se usará globalmente para todas las actividades.';
 $string['logging'] = 'Habilitar registro';
 $string['loggingdesc'] = 'Si esta configuración está activa, todos los mensajes de usuario y respuestas de IA serán registrados.';
 $string['defaultvalues'] = 'Valores predeterminados';
@@ -99,19 +99,9 @@ $string['noassistants'] = 'Aún no has creado ningún asistente. Necesitas crear
 $string['persistconvo'] = 'Persistir conversaciones';
 $string['persistconvodesc'] = 'Si esta casilla está marcada, el asistente recordará la conversación entre cargas de página.';
 
-// Configuración de API de Azure
-$string['azureheading'] = 'Configuración de API de Azure';
-$string['azureheadingdesc'] = 'Estas configuraciones solo aplican al tipo de API de Azure.';
-$string['resourcename'] = 'Nombre del recurso';
-$string['resourcenamedesc'] = 'El nombre de su recurso de Azure OpenAI.';
-$string['deploymentid'] = 'ID de implementación';
-$string['deploymentiddesc'] = 'El nombre de implementación que eligió cuando implementó el modelo.';
-$string['apiversion'] = 'Versión de API';
-$string['apiversiondesc'] = 'La versión de API a usar para esta operación. Esto sigue el formato AAAA-MM-DD.';
-
 // Configuración de API de chat
 $string['chatheading'] = 'Configuración de API de Chat';
-$string['chatheadingdesc'] = 'Estas configuraciones solo aplican a los tipos de API de Chat y Azure.';
+$string['chatheadingdesc'] = 'Estas configuraciones solo aplican al tipo de API de Chat.';
 $string['prompt'] = 'Prompt de completado';
 $string['promptdesc'] = 'El prompt predeterminado que se le dará a la IA antes de la transcripción de la conversación';
 $string['assistantname'] = 'Nombre del asistente';
