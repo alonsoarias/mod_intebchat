@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/intebchat/db" VERSION="20250219" COMMENT="XMLDB file for Moodle mod_intebchat"
+<XMLDB PATH="mod/intebchat/db" VERSION="20250220" COMMENT="XMLDB file for Moodle mod_intebchat"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
@@ -12,7 +12,7 @@
         <FIELD NAME="intro" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Activity description."/>
         <FIELD NAME="introformat" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The format of the intro field."/>
         <FIELD NAME="showlabels" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Show name labels in chat"/>
-        <FIELD NAME="apitype" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="chat" SEQUENCE="false" COMMENT="API type: chat, assistant, or azure"/>
+        <FIELD NAME="apitype" TYPE="char" LENGTH="20" NOTNULL="true" DEFAULT="chat" SEQUENCE="false" COMMENT="API type: chat or assistant"/>
         <FIELD NAME="sourceoftruth" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Source of truth for the AI"/>
         <FIELD NAME="prompt" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Custom prompt for the AI"/>
         <FIELD NAME="instructions" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Instructions for assistant API"/>
@@ -26,9 +26,6 @@
         <FIELD NAME="presence" TYPE="number" LENGTH="10" DECIMALS="2" NOTNULL="false" SEQUENCE="false" COMMENT="Presence penalty"/>
         <FIELD NAME="assistant" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Assistant ID"/>
         <FIELD NAME="persistconvo" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Persist conversations"/>
-        <FIELD NAME="resourcename" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Azure resource name"/>
-        <FIELD NAME="deploymentid" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Azure deployment ID"/>
-        <FIELD NAME="apiversion" TYPE="char" LENGTH="50" NOTNULL="false" SEQUENCE="false" COMMENT="Azure API version"/>
         <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of when the instance was added to the course."/>
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Timestamp of when the instance was last modified."/>
       </FIELDS>
@@ -81,6 +78,28 @@
       <INDEXES>
         <INDEX NAME="user-period" UNIQUE="true" FIELDS="userid, periodstart, periodtype"/>
         <INDEX NAME="periodstart" UNIQUE="false" FIELDS="periodstart"/>
+      </INDEXES>
+    </TABLE>
+    <TABLE NAME="mod_intebchat_usage" COMMENT="Detailed token usage tracking by agent/assistant">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="instanceid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The ID of the module instance"/>
+        <FIELD NAME="agentid" TYPE="char" LENGTH="64" NOTNULL="true" DEFAULT="default" SEQUENCE="false" COMMENT="The agent or assistant ID"/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The ID of the user"/>
+        <FIELD NAME="model" TYPE="char" LENGTH="64" NOTNULL="true" SEQUENCE="false" COMMENT="The model used"/>
+        <FIELD NAME="prompttokens" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Number of tokens in the prompt"/>
+        <FIELD NAME="completiontokens" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Number of tokens in the completion"/>
+        <FIELD NAME="totaltokens" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Total number of tokens used"/>
+        <FIELD NAME="timecreated" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="When this record was created"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="instanceid" TYPE="foreign" FIELDS="instanceid" REFTABLE="intebchat" REFFIELDS="id"/>
+        <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
+      </KEYS>
+      <INDEXES>
+        <INDEX NAME="agentid-time" UNIQUE="false" FIELDS="agentid, timecreated"/>
+        <INDEX NAME="userid-time" UNIQUE="false" FIELDS="userid, timecreated"/>
       </INDEXES>
     </TABLE>
   </TABLES>
